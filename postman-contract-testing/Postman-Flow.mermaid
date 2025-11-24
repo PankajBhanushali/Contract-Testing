@@ -1,0 +1,71 @@
+graph TD
+    subgraph API Provider
+        PS["1️⃣ Provider API Service"] --> PC["2️⃣ Product Controller<br/>GET /api/products<br/>GET /api/products/{id}"]
+        style PS fill:#90ee90,stroke:#333,stroke-width:2px
+        style PC fill:#90ee90,stroke:#333,stroke-width:2px
+    end
+
+    subgraph Contract Definition
+        PD["📋 Postman Collection<br/>Define API Contract"]
+        style PD fill:#fff4e6,stroke:#333,stroke-width:2px
+    end
+
+    subgraph Test Scenarios
+        T1["3️⃣ Get All Products<br/>Status: 200"]
+        T2["4️⃣ Get Product by ID<br/>Status: 200"]
+        T3["5️⃣ Not Found Case<br/>Status: 404"]
+        style T1 fill:#e0f7fa,stroke:#333,stroke-width:2px
+        style T2 fill:#e0f7fa,stroke:#333,stroke-width:2px
+        style T3 fill:#e0f7fa,stroke:#333,stroke-width:2px
+    end
+
+    subgraph Validation & Assertions
+        VA["6️⃣ JavaScript Assertions<br/>Validate Response Schema<br/>Check Status Codes"]
+        style VA fill:#f3e5f5,stroke:#333,stroke-width:2px
+    end
+
+    subgraph Execution & Reporting
+        NM["7️⃣ Newman CLI Execution<br/>Run Collection"]
+        RT["8️⃣ Test Results & Report<br/>Pass/Fail Assertions"]
+        style NM fill:#d3d3d3,stroke:#333,stroke-width:2px
+        style RT fill:#d3d3d3,stroke:#333,stroke-width:2px
+    end
+
+    subgraph Continuous Integration
+        CI["9️⃣ CI/CD Pipeline<br/>GitHub Actions"]
+        style CI fill:#eceff1,stroke:#333,stroke-width:2px
+    end
+
+    PC -->|"Data"| PD
+    PD -->|"Import"| T1
+    PD -->|"Import"| T2
+    PD -->|"Import"| T3
+    T1 --> VA
+    T2 --> VA
+    T3 --> VA
+    VA -->|"Step 6"| NM
+    NM -->|"Step 7"| RT
+    RT -->|"Step 8"| CI
+
+    classDef ProviderClass fill:#e8f5e9,stroke:#33691e,stroke-width:2px;
+    classDef ContractClass fill:#fff8e1,stroke:#f57f17,stroke-width:2px;
+    classDef TestClass fill:#e0f2f1,stroke:#00695c,stroke-width:2px;
+    classDef ValidationClass fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px;
+    classDef ExecutionClass fill:#eceff1,stroke:#455a64,stroke-width:2px;
+
+    class PS,PC ProviderClass
+    class PD ContractClass
+    class T1,T2,T3 TestClass
+    class VA ValidationClass
+    class NM,RT,CI ExecutionClass
+
+    %% FLOW ORDER:
+    %% 1. Provider API Service starts and listens for requests
+    %% 2. Product Controller exposes REST endpoints
+    %% 3. Test Scenario: Verify Get All Products returns 200
+    %% 4. Test Scenario: Verify Get Product by ID returns 200
+    %% 5. Test Scenario: Verify Not Found returns 404
+    %% 6. Assertions validate response schema and status codes
+    %% 7. Newman CLI executes the Postman collection
+    %% 8. Test Results are generated and reported
+    %% 9. CI/CD pipeline runs automated contract validation
