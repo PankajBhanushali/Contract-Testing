@@ -1,0 +1,16 @@
+# OSX
+**/.DS_Store
+
+# vim swap files
+**/*.swp
+
+# VS code
+**/.vs/
+**/.vscode/
+
+# build output
+**/bin
+**/obj
+
+## pact files
+pacts

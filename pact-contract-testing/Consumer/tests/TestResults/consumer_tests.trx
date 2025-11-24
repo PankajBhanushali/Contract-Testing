@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="70d0d21b-22e1-4cc6-ad7c-0139fdd25c94" name="crf8625@IN01-5B5YGC4 2025-11-24 21:35:54" runUser="VMS\crf8625" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2025-11-24T21:35:54.8452634+05:30" queuing="2025-11-24T21:35:54.8452640+05:30" start="2025-11-24T21:35:52.0184761+05:30" finish="2025-11-24T21:35:54.8595981+05:30" />
+  <TestSettings name="default" id="14799379-1150-4241-9236-b6d5f07f11a3">
+    <Deployment runDeploymentRoot="crf8625_IN01-5B5YGC4_2025-11-24_21_35_54" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="cad648be-24f7-4515-b003-72228c8a8ba3" testId="b613fac0-f527-c953-3bbf-5478e9646b2a" testName="tests.ApiTest.GetProduct" computerName="IN01-5B5YGC4" duration="00:00:00.0014815" startTime="2025-11-24T21:35:54.7831988+05:30" endTime="2025-11-24T21:35:54.7832781+05:30" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cad648be-24f7-4515-b003-72228c8a8ba3">
+      <Output>
+        <ErrorInfo>
+          <Message>System.InvalidOperationException : Unable to start mock server</Message>
+          <StackTrace>   at PactNet.Drivers.HttpPactDriver.CreateMockServer(String host, Nullable`1 port, Boolean tls)&#xD;
+   at PactNet.PactBuilder.StartMockServer()&#xD;
+   at PactNet.PactBuilder.VerifyAsync(Func`2 interact)&#xD;
+   at tests.ApiTest.GetProduct() in C:\Users\crf8625\OneDrive - Siemens Healthineers\Documents\Work\Learning\Contract Testing\pact-contract-testing\Consumer\tests\ApiTest.cs:line 74&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="8a223822-bb54-46c3-9573-3ddafb7b673e" testId="be212b3b-aa75-2783-d31d-c9ad96c78fbb" testName="tests.ApiTest.GetAllProducts" computerName="IN01-5B5YGC4" duration="00:00:00.5321977" startTime="2025-11-24T21:35:54.2219929+05:30" endTime="2025-11-24T21:35:54.7729421+05:30" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8a223822-bb54-46c3-9573-3ddafb7b673e">
+      <Output>
+        <ErrorInfo>
+          <Message>System.InvalidOperationException : Unable to start mock server</Message>
+          <StackTrace>   at PactNet.Drivers.HttpPactDriver.CreateMockServer(String host, Nullable`1 port, Boolean tls)&#xD;
+   at PactNet.PactBuilder.StartMockServer()&#xD;
+   at PactNet.PactBuilder.VerifyAsync(Func`2 interact)&#xD;
+   at tests.ApiTest.GetAllProducts() in C:\Users\crf8625\OneDrive - Siemens Healthineers\Documents\Work\Learning\Contract Testing\pact-contract-testing\Consumer\tests\ApiTest.cs:line 54&#xD;
+--- End of stack trace from previous location ---</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="tests.ApiTest.GetAllProducts" storage="c:\users\crf8625\onedrive - siemens healthineers\documents\work\learning\contract testing\pact-contract-testing\consumer\tests\bin\debug\net8.0\tests.dll" id="be212b3b-aa75-2783-d31d-c9ad96c78fbb">
+      <Execution id="8a223822-bb54-46c3-9573-3ddafb7b673e" />
+      <TestMethod codeBase="C:\Users\crf8625\OneDrive - Siemens Healthineers\Documents\Work\Learning\Contract Testing\pact-contract-testing\Consumer\tests\bin\Debug\net8.0\tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="tests.ApiTest" name="GetAllProducts" />
+    </UnitTest>
+    <UnitTest name="tests.ApiTest.GetProduct" storage="c:\users\crf8625\onedrive - siemens healthineers\documents\work\learning\contract testing\pact-contract-testing\consumer\tests\bin\debug\net8.0\tests.dll" id="b613fac0-f527-c953-3bbf-5478e9646b2a">
+      <Execution id="cad648be-24f7-4515-b003-72228c8a8ba3" />
+      <TestMethod codeBase="C:\Users\crf8625\OneDrive - Siemens Healthineers\Documents\Work\Learning\Contract Testing\pact-contract-testing\Consumer\tests\bin\Debug\net8.0\tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="tests.ApiTest" name="GetProduct" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="b613fac0-f527-c953-3bbf-5478e9646b2a" executionId="cad648be-24f7-4515-b003-72228c8a8ba3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="be212b3b-aa75-2783-d31d-c9ad96c78fbb" executionId="8a223822-bb54-46c3-9573-3ddafb7b673e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="2" executed="2" passed="0" failed="2" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.5+1b188a7b0a (64-bit .NET 8.0.21)&#xD;
+[xUnit.net 00:00:00.74]   Discovering: tests&#xD;
+[xUnit.net 00:00:00.78]   Discovered:  tests&#xD;
+[xUnit.net 00:00:00.80]   Starting:    tests&#xD;
+[xUnit.net 00:00:01.37]       System.InvalidOperationException : Unable to start mock server&#xD;
+[xUnit.net 00:00:01.37]       Stack Trace:&#xD;
+[xUnit.net 00:00:01.37]            at PactNet.Drivers.HttpPactDriver.CreateMockServer(String host, Nullable`1 port, Boolean tls)&#xD;
+[xUnit.net 00:00:01.37]            at PactNet.PactBuilder.StartMockServer()&#xD;
+[xUnit.net 00:00:01.37]            at PactNet.PactBuilder.VerifyAsync(Func`2 interact)&#xD;
+[xUnit.net 00:00:01.37]         C:\Users\crf8625\OneDrive - Siemens Healthineers\Documents\Work\Learning\Contract Testing\pact-contract-testing\Consumer\tests\ApiTest.cs(54,0): at tests.ApiTest.GetAllProducts()&#xD;
+[xUnit.net 00:00:01.37]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:01.37]       System.InvalidOperationException : Unable to start mock server&#xD;
+[xUnit.net 00:00:01.37]       Stack Trace:&#xD;
+[xUnit.net 00:00:01.37]            at PactNet.Drivers.HttpPactDriver.CreateMockServer(String host, Nullable`1 port, Boolean tls)&#xD;
+[xUnit.net 00:00:01.37]            at PactNet.PactBuilder.StartMockServer()&#xD;
+[xUnit.net 00:00:01.37]            at PactNet.PactBuilder.VerifyAsync(Func`2 interact)&#xD;
+[xUnit.net 00:00:01.37]         C:\Users\crf8625\OneDrive - Siemens Healthineers\Documents\Work\Learning\Contract Testing\pact-contract-testing\Consumer\tests\ApiTest.cs(74,0): at tests.ApiTest.GetProduct()&#xD;
+[xUnit.net 00:00:01.37]         --- End of stack trace from previous location ---&#xD;
+[xUnit.net 00:00:01.38]   Finished:    tests&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="IN01-5B5YGC4" outcome="Error" timestamp="2025-11-24T21:35:54.7760935+05:30">
+        <Text>[xUnit.net 00:00:01.37]     tests.ApiTest.GetAllProducts [FAIL]</Text>
+      </RunInfo>
+      <RunInfo computerName="IN01-5B5YGC4" outcome="Error" timestamp="2025-11-24T21:35:54.7873021+05:30">
+        <Text>[xUnit.net 00:00:01.37]     tests.ApiTest.GetProduct [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>

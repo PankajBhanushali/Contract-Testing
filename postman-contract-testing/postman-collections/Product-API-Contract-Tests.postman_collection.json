@@ -1,0 +1,144 @@
+{
+  "info": {
+    "name": "Product API - Contract Tests",
+    "_postman_id": "12345-67890-abcdef",
+    "description": "Contract tests for Product API - Consumer expectations",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Get All Products",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Contract Test: Verify response structure and data types",
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is JSON\", function () {",
+              "    pm.response.to.be.json;",
+              "});",
+              "",
+              "pm.test(\"Response is an array\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "});",
+              "",
+              "pm.test(\"Each product has required fields\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    jsonData.forEach(product => {",
+              "        pm.expect(product).to.have.property('id').that.is.a('number');",
+              "        pm.expect(product).to.have.property('name').that.is.a('string');",
+              "        pm.expect(product).to.have.property('type').that.is.a('string');",
+              "        pm.expect(product).to.have.property('version').that.is.a('string');",
+              "    });",
+              "});",
+              "",
+              "pm.test(\"Products array is not empty\", function () {",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData.length).to.be.above(0);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/products",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "products"]
+        }
+      }
+    },
+    {
+      "name": "Get Product by ID (Exists)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Contract Test: Verify single product response",
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is JSON object\", function () {",
+              "    pm.response.to.be.json;",
+              "    const jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('object');",
+              "});",
+              "",
+              "pm.test(\"Product has all required fields with correct types\", function () {",
+              "    const product = pm.response.json();",
+              "    pm.expect(product).to.have.property('id').that.is.a('number');",
+              "    pm.expect(product).to.have.property('name').that.is.a('string');",
+              "    pm.expect(product).to.have.property('type').that.is.a('string');",
+              "    pm.expect(product).to.have.property('version').that.is.a('string');",
+              "});",
+              "",
+              "pm.test(\"Product ID matches requested ID\", function () {",
+              "    const product = pm.response.json();",
+              "    pm.expect(product.id).to.equal(10);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/products/10",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "products", "10"]
+        }
+      }
+    },
+    {
+      "name": "Get Product by ID (Not Found)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Contract Test: Verify 404 behavior",
+              "pm.test(\"Status code is 404\", function () {",
+              "    pm.response.to.have.status(404);",
+              "});",
+              "",
+              "pm.test(\"Response body is empty or minimal\", function () {",
+              "    const body = pm.response.text();",
+              "    // 404 can have empty body or error message",
+              "    pm.expect(body.length).to.be.below(100);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/products/999",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "products", "999"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5001",
+      "type": "string"
+    }
+  ]
+}

@@ -1,0 +1,299 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="76fa8d35-0796-4c62-8deb-a19837121b74" name="crf8625@IN01-5B5YGC4 2025-11-24 21:44:12" runUser="VMS\crf8625" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2025-11-24T21:44:12.5033990+05:30" queuing="2025-11-24T21:44:12.5034003+05:30" start="2025-11-24T21:44:11.2200250+05:30" finish="2025-11-24T21:44:12.5191120+05:30" />
+  <TestSettings name="default" id="02ef550d-972b-480f-96dc-3b4d66b94fea">
+    <Deployment runDeploymentRoot="crf8625_IN01-5B5YGC4_2025-11-24_21_44_12" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="e032c355-4811-4318-a0bc-fbb67e71fd4c" testId="e2cd947b-408b-787f-aab8-5306ff9d457c" testName="tests.ProductTest.EnsureProviderApiHonoursPactWithConsumer" computerName="IN01-5B5YGC4" duration="00:00:00.4177713" startTime="2025-11-24T21:44:11.9653132+05:30" endTime="2025-11-24T21:44:12.3931047+05:30" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e032c355-4811-4318-a0bc-fbb67e71fd4c">
+      <Output>
+        <StdOut>Starting verification...&#xD;
+Pact verification failed
+&#xD;
+Verifier Output&#xD;
+---------------&#xD;
+
+Verifying a pact between ApiClient and ProductService
+
+  A valid request for a product (1ms loading, 38ms verification)
+     Given No auth token is provided
+    returns a response which
+      has status code 401 (OK)
+      has a matching body (OK)
+
+  A valid request for a product (1ms loading, 5ms verification)
+     Given product with ID 10 exists
+    returns a response which
+      has status code 200 (FAILED)
+      includes headers
+        "Content-Type" with value "application/json; charset=utf-8" (FAILED)
+      has a matching body (FAILED)
+
+  A valid request for a product (1ms loading, 31ms verification)
+     Given product with ID 11 does not exist
+    returns a response which
+      has status code 404 (OK)
+      has a matching body (OK)
+
+  A valid request for all products (1ms loading, 20ms verification)
+     Given no products exist
+    returns a response which
+      has status code 200 (OK)
+      includes headers
+        "Content-Type" with value "application/json; charset=utf-8" (OK)
+      has a matching body (OK)
+
+  A valid request for all products (1ms loading, 5ms verification)
+     Given products exist
+    returns a response which
+      has status code 200 (FAILED)
+      includes headers
+        "Content-Type" with value "application/json; charset=utf-8" (FAILED)
+      has a matching body (FAILED)
+
+
+Failures:
+
+1) Verifying a pact between ApiClient and ProductService Given product with ID 10 exists - A valid request for a product
+    1.1) has a matching body
+           / -&gt; Expected body Present(65 bytes) but was empty
+    1.2) has status code 200
+           expected 200 but was 401
+    1.3) includes header 'Content-Type' with value '"application/json; charset=utf-8"'
+           Expected header 'Content-Type' to have value '"application/json; charset=utf-8"' but was ''
+2) Verifying a pact between ApiClient and ProductService Given products exist - A valid request for all products
+    2.1) has a matching body
+           / -&gt; Expected body Present(130 bytes) but was empty
+    2.2) has status code 200
+           expected 200 but was 401
+    2.3) includes header 'Content-Type' with value '"application/json; charset=utf-8"'
+           Expected header 'Content-Type' to have value '"application/json; charset=utf-8"' but was ''
+
+There were 2 pact failures
+&#xD;
+Verifier Logs&#xD;
+-------------&#xD;
+2025-11-24T16:14:12.201160Z  INFO ThreadId(17) pact_verifier: Running setup provider state change handler 'No auth token is provided' for 'A valid request for a product'
+2025-11-24T16:14:12.235430Z  INFO ThreadId(17) pact_verifier: Running provider verification for 'A valid request for a product'
+2025-11-24T16:14:12.235529Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request to provider at http://127.0.0.1:9001/
+2025-11-24T16:14:12.235533Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request HTTP Request ( method: GET, path: /api/products/10, query: None, headers: None, body: Missing )
+2025-11-24T16:14:12.237603Z  INFO ThreadId(17) pact_verifier::provider_client: Received response: HTTP Response ( status: 401, headers: Some({"server": ["Kestrel"], "content-length": ["0"], "date": ["Mon, 24 Nov 2025 16:14:12 GMT"]}), body: Empty )
+2025-11-24T16:14:12.239271Z  INFO ThreadId(17) pact_verifier: Running setup provider state change handler 'product with ID 10 exists' for 'A valid request for a product'
+2025-11-24T16:14:12.242430Z  INFO ThreadId(17) pact_verifier: Running provider verification for 'A valid request for a product'
+2025-11-24T16:14:12.242483Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request to provider at http://127.0.0.1:9001/
+2025-11-24T16:14:12.242485Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request HTTP Request ( method: GET, path: /api/product/10, query: None, headers: None, body: Missing )
+2025-11-24T16:14:12.242885Z  INFO ThreadId(17) pact_verifier::provider_client: Received response: HTTP Response ( status: 401, headers: Some({"content-length": ["0"], "date": ["Mon, 24 Nov 2025 16:14:12 GMT"], "server": ["Kestrel"]}), body: Empty )
+2025-11-24T16:14:12.244178Z  INFO ThreadId(17) pact_verifier: Running setup provider state change handler 'product with ID 11 does not exist' for 'A valid request for a product'
+2025-11-24T16:14:12.246394Z  INFO ThreadId(17) pact_verifier: Running provider verification for 'A valid request for a product'
+2025-11-24T16:14:12.246428Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request to provider at http://127.0.0.1:9001/
+2025-11-24T16:14:12.246431Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request HTTP Request ( method: GET, path: /api/products/11, query: None, headers: Some({"Authorization": ["Bearer 2019-01-14T11:34:18.045Z"]}), body: Missing )
+2025-11-24T16:14:12.274151Z  INFO ThreadId(17) pact_verifier::provider_client: Received response: HTTP Response ( status: 404, headers: Some({"date": ["Mon, 24 Nov 2025 16:14:12 GMT"], "content-length": ["0"], "server": ["Kestrel"]}), body: Empty )
+2025-11-24T16:14:12.276198Z  INFO ThreadId(17) pact_verifier: Running setup provider state change handler 'no products exist' for 'A valid request for all products'
+2025-11-24T16:14:12.280760Z  INFO ThreadId(17) pact_verifier: Running provider verification for 'A valid request for all products'
+2025-11-24T16:14:12.280795Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request to provider at http://127.0.0.1:9001/
+2025-11-24T16:14:12.280797Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request HTTP Request ( method: GET, path: /api/products, query: None, headers: Some({"Authorization": ["Bearer 2019-01-14T11:34:18.045Z"]}), body: Missing )
+2025-11-24T16:14:12.293750Z  INFO ThreadId(17) pact_verifier::provider_client: Received response: HTTP Response ( status: 200, headers: Some({"content-type": ["application/json; charset=utf-8"], "server": ["Kestrel"], "date": ["Mon, 24 Nov 2025 16:14:12 GMT"], "transfer-encoding": ["chunked"]}), body: Present(204 bytes, application/json;charset=utf-8) )
+2025-11-24T16:14:12.296337Z  INFO ThreadId(17) pact_verifier: Running setup provider state change handler 'products exist' for 'A valid request for all products'
+2025-11-24T16:14:12.299580Z  INFO ThreadId(17) pact_verifier: Running provider verification for 'A valid request for all products'
+2025-11-24T16:14:12.299616Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request to provider at http://127.0.0.1:9001/
+2025-11-24T16:14:12.299623Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request HTTP Request ( method: GET, path: /api/products, query: None, headers: None, body: Missing )
+2025-11-24T16:14:12.299888Z  INFO ThreadId(17) pact_verifier::provider_client: Received response: HTTP Response ( status: 401, headers: Some({"date": ["Mon, 24 Nov 2025 16:14:12 GMT"], "content-length": ["0"], "server": ["Kestrel"]}), body: Empty )
+2025-11-24T16:14:12.300117Z  WARN ThreadId(17) pact_matching::metrics: 
+
+Please note:
+We are tracking events anonymously to gather important usage statistics like Pact version and operating system. To disable tracking, set the 'PACT_DO_NOT_TRACK' environment variable to 'true'.</StdOut>
+        <ErrorInfo>
+          <Message>PactNet.Exceptions.PactVerificationFailedException : Pact verification failed</Message>
+          <StackTrace>   at PactNet.Verifier.InteropVerifierProvider.Execute()&#xD;
+   at PactNet.Verifier.PactVerifierSource.Verify()&#xD;
+   at tests.ProductTest.EnsureProviderApiHonoursPactWithConsumer() in C:\Users\crf8625\OneDrive - Siemens Healthineers\Documents\Work\Learning\Contract Testing\pact-contract-testing\Provider\tests\ProductTest.cs:line 43&#xD;
+   at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="tests.ProductTest.EnsureProviderApiHonoursPactWithConsumer" storage="c:\users\crf8625\onedrive - siemens healthineers\documents\work\learning\contract testing\pact-contract-testing\provider\tests\bin\debug\net8.0\tests.dll" id="e2cd947b-408b-787f-aab8-5306ff9d457c">
+      <Execution id="e032c355-4811-4318-a0bc-fbb67e71fd4c" />
+      <TestMethod codeBase="C:\Users\crf8625\OneDrive - Siemens Healthineers\Documents\Work\Learning\Contract Testing\pact-contract-testing\Provider\tests\bin\Debug\net8.0\tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="tests.ProductTest" name="EnsureProviderApiHonoursPactWithConsumer" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="e2cd947b-408b-787f-aab8-5306ff9d457c" executionId="e032c355-4811-4318-a0bc-fbb67e71fd4c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Failed">
+    <Counters total="1" executed="1" passed="0" failed="1" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.5+1b188a7b0a (64-bit .NET 8.0.21)&#xD;
+[xUnit.net 00:00:00.10]   Discovering: tests&#xD;
+[xUnit.net 00:00:00.13]   Discovered:  tests&#xD;
+[xUnit.net 00:00:00.15]   Starting:    tests&#xD;
+Verifying a pact between \u001b[1mApiClient\u001b[0m and \u001b[1mProductService\u001b[0m&#xD;
+  A valid request for a product (1ms loading, 38ms verification)&#xD;
+     Given No auth token is provided&#xD;
+    returns a response which&#xD;
+      has status code \u001b[1m401\u001b[0m (\u001b[32mOK\u001b[0m)&#xD;
+      has a matching body (\u001b[32mOK\u001b[0m)&#xD;
+  A valid request for a product (1ms loading, 5ms verification)&#xD;
+     Given product with ID 10 exists&#xD;
+    returns a response which&#xD;
+      has status code \u001b[1m200\u001b[0m (\u001b[31mFAILED\u001b[0m)&#xD;
+      includes headers&#xD;
+        "\u001b[1mContent-Type\u001b[0m" with value "\u001b[1mapplication/json; charset=utf-8\u001b[0m" (\u001b[31mFAILED\u001b[0m)&#xD;
+      has a matching body (\u001b[31mFAILED\u001b[0m)&#xD;
+  A valid request for a product (1ms loading, 31ms verification)&#xD;
+     Given product with ID 11 does not exist&#xD;
+    returns a response which&#xD;
+      has status code \u001b[1m404\u001b[0m (\u001b[32mOK\u001b[0m)&#xD;
+      has a matching body (\u001b[32mOK\u001b[0m)&#xD;
+  A valid request for all products (1ms loading, 20ms verification)&#xD;
+     Given no products exist&#xD;
+    returns a response which&#xD;
+      has status code \u001b[1m200\u001b[0m (\u001b[32mOK\u001b[0m)&#xD;
+      includes headers&#xD;
+        "\u001b[1mContent-Type\u001b[0m" with value "\u001b[1mapplication/json; charset=utf-8\u001b[0m" (\u001b[32mOK\u001b[0m)&#xD;
+      has a matching body (\u001b[32mOK\u001b[0m)&#xD;
+  A valid request for all products (1ms loading, 5ms verification)&#xD;
+     Given products exist&#xD;
+    returns a response which&#xD;
+      has status code \u001b[1m200\u001b[0m (\u001b[31mFAILED\u001b[0m)&#xD;
+      includes headers&#xD;
+        "\u001b[1mContent-Type\u001b[0m" with value "\u001b[1mapplication/json; charset=utf-8\u001b[0m" (\u001b[31mFAILED\u001b[0m)&#xD;
+      has a matching body (\u001b[31mFAILED\u001b[0m)&#xD;
+Failures:&#xD;
+1) Verifying a pact between ApiClient and ProductService Given product with ID 10 exists - A valid request for a product&#xD;
+    1.1) has a matching body&#xD;
+           \u001b[1m/\u001b[0m -&gt; Expected body Present(65 bytes) but was empty&#xD;
+    1.2) has status code 200&#xD;
+           expected \u001b[31m200\u001b[0m but was \u001b[32m401\u001b[0m&#xD;
+    1.3) includes header 'Content-Type' with value '"application/json; charset=utf-8"'&#xD;
+           Expected header '\u001b[1mContent-Type\u001b[0m' to have value '\u001b[31m"application/json; charset=utf-8"\u001b[0m' but was '\u001b[32m\u001b[0m'&#xD;
+2) Verifying a pact between ApiClient and ProductService Given products exist - A valid request for all products&#xD;
+    2.1) has a matching body&#xD;
+           \u001b[1m/\u001b[0m -&gt; Expected body Present(130 bytes) but was empty&#xD;
+    2.2) has status code 200&#xD;
+           expected \u001b[31m200\u001b[0m but was \u001b[32m401\u001b[0m&#xD;
+    2.3) includes header 'Content-Type' with value '"application/json; charset=utf-8"'&#xD;
+           Expected header '\u001b[1mContent-Type\u001b[0m' to have value '\u001b[31m"application/json; charset=utf-8"\u001b[0m' but was '\u001b[32m\u001b[0m'&#xD;
+There were 2 pact failures&#xD;
+[xUnit.net 00:00:00.59]       PactNet.Exceptions.PactVerificationFailedException : Pact verification failed&#xD;
+[xUnit.net 00:00:00.59]       Stack Trace:&#xD;
+[xUnit.net 00:00:00.59]            at PactNet.Verifier.InteropVerifierProvider.Execute()&#xD;
+[xUnit.net 00:00:00.59]            at PactNet.Verifier.PactVerifierSource.Verify()&#xD;
+[xUnit.net 00:00:00.59]         C:\Users\crf8625\OneDrive - Siemens Healthineers\Documents\Work\Learning\Contract Testing\pact-contract-testing\Provider\tests\ProductTest.cs(43,0): at tests.ProductTest.EnsureProviderApiHonoursPactWithConsumer()&#xD;
+[xUnit.net 00:00:00.59]            at System.RuntimeMethodHandle.InvokeMethod(Object target, Void** arguments, Signature sig, Boolean isConstructor)&#xD;
+[xUnit.net 00:00:00.59]            at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)&#xD;
+[xUnit.net 00:00:00.59]       Output:&#xD;
+[xUnit.net 00:00:00.59]         Starting verification...&#xD;
+[xUnit.net 00:00:00.59]         Pact verification failed
+&#xD;
+[xUnit.net 00:00:00.59]         Verifier Output&#xD;
+[xUnit.net 00:00:00.59]         ---------------&#xD;
+[xUnit.net 00:00:00.59]         
+Verifying a pact between ApiClient and ProductService
+
+  A valid request for a product (1ms loading, 38ms verification)
+     Given No auth token is provided
+    returns a response which
+      has status code 401 (OK)
+      has a matching body (OK)
+
+  A valid request for a product (1ms loading, 5ms verification)
+     Given product with ID 10 exists
+    returns a response which
+      has status code 200 (FAILED)
+      includes headers
+        "Content-Type" with value "application/json; charset=utf-8" (FAILED)
+      has a matching body (FAILED)
+
+  A valid request for a product (1ms loading, 31ms verification)
+     Given product with ID 11 does not exist
+    returns a response which
+      has status code 404 (OK)
+      has a matching body (OK)
+
+  A valid request for all products (1ms loading, 20ms verification)
+     Given no products exist
+    returns a response which
+      has status code 200 (OK)
+      includes headers
+        "Content-Type" with value "application/json; charset=utf-8" (OK)
+      has a matching body (OK)
+
+  A valid request for all products (1ms loading, 5ms verification)
+     Given products exist
+    returns a response which
+      has status code 200 (FAILED)
+      includes headers
+        "Content-Type" with value "application/json; charset=utf-8" (FAILED)
+      has a matching body (FAILED)
+
+
+Failures:
+
+1) Verifying a pact between ApiClient and ProductService Given product with ID 10 exists - A valid request for a product
+    1.1) has a matching body
+           / -&gt; Expected body Present(65 bytes) but was empty
+    1.2) has status code 200
+           expected 200 but was 401
+    1.3) includes header 'Content-Type' with value '"application/json; charset=utf-8"'
+           Expected header 'Content-Type' to have value '"application/json; charset=utf-8"' but was ''
+2) Verifying a pact between ApiClient and ProductService Given products exist - A valid request for all products
+    2.1) has a matching body
+           / -&gt; Expected body Present(130 bytes) but was empty
+    2.2) has status code 200
+           expected 200 but was 401
+    2.3) includes header 'Content-Type' with value '"application/json; charset=utf-8"'
+           Expected header 'Content-Type' to have value '"application/json; charset=utf-8"' but was ''
+
+There were 2 pact failures
+&#xD;
+[xUnit.net 00:00:00.59]         Verifier Logs&#xD;
+[xUnit.net 00:00:00.59]         -------------&#xD;
+[xUnit.net 00:00:00.59]         2025-11-24T16:14:12.201160Z  INFO ThreadId(17) pact_verifier: Running setup provider state change handler 'No auth token is provided' for 'A valid request for a product'
+2025-11-24T16:14:12.235430Z  INFO ThreadId(17) pact_verifier: Running provider verification for 'A valid request for a product'
+2025-11-24T16:14:12.235529Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request to provider at http://127.0.0.1:9001/
+2025-11-24T16:14:12.235533Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request HTTP Request ( method: GET, path: /api/products/10, query: None, headers: None, body: Missing )
+2025-11-24T16:14:12.237603Z  INFO ThreadId(17) pact_verifier::provider_client: Received response: HTTP Response ( status: 401, headers: Some({"server": ["Kestrel"], "content-length": ["0"], "date": ["Mon, 24 Nov 2025 16:14:12 GMT"]}), body: Empty )
+2025-11-24T16:14:12.239271Z  INFO ThreadId(17) pact_verifier: Running setup provider state change handler 'product with ID 10 exists' for 'A valid request for a product'
+2025-11-24T16:14:12.242430Z  INFO ThreadId(17) pact_verifier: Running provider verification for 'A valid request for a product'
+2025-11-24T16:14:12.242483Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request to provider at http://127.0.0.1:9001/
+2025-11-24T16:14:12.242485Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request HTTP Request ( method: GET, path: /api/product/10, query: None, headers: None, body: Missing )
+2025-11-24T16:14:12.242885Z  INFO ThreadId(17) pact_verifier::provider_client: Received response: HTTP Response ( status: 401, headers: Some({"content-length": ["0"], "date": ["Mon, 24 Nov 2025 16:14:12 GMT"], "server": ["Kestrel"]}), body: Empty )
+2025-11-24T16:14:12.244178Z  INFO ThreadId(17) pact_verifier: Running setup provider state change handler 'product with ID 11 does not exist' for 'A valid request for a product'
+2025-11-24T16:14:12.246394Z  INFO ThreadId(17) pact_verifier: Running provider verification for 'A valid request for a product'
+2025-11-24T16:14:12.246428Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request to provider at http://127.0.0.1:9001/
+2025-11-24T16:14:12.246431Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request HTTP Request ( method: GET, path: /api/products/11, query: None, headers: Some({"Authorization": ["Bearer 2019-01-14T11:34:18.045Z"]}), body: Missing )
+2025-11-24T16:14:12.274151Z  INFO ThreadId(17) pact_verifier::provider_client: Received response: HTTP Response ( status: 404, headers: Some({"date": ["Mon, 24 Nov 2025 16:14:12 GMT"], "content-length": ["0"], "server": ["Kestrel"]}), body: Empty )
+2025-11-24T16:14:12.276198Z  INFO ThreadId(17) pact_verifier: Running setup provider state change handler 'no products exist' for 'A valid request for all products'
+2025-11-24T16:14:12.280760Z  INFO ThreadId(17) pact_verifier: Running provider verification for 'A valid request for all products'
+2025-11-24T16:14:12.280795Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request to provider at http://127.0.0.1:9001/
+2025-11-24T16:14:12.280797Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request HTTP Request ( method: GET, path: /api/products, query: None, headers: Some({"Authorization": ["Bearer 2019-01-14T11:34:18.045Z"]}), body: Missing )
+2025-11-24T16:14:12.293750Z  INFO ThreadId(17) pact_verifier::provider_client: Received response: HTTP Response ( status: 200, headers: Some({"content-type": ["application/json; charset=utf-8"], "server": ["Kestrel"], "date": ["Mon, 24 Nov 2025 16:14:12 GMT"], "transfer-encoding": ["chunked"]}), body: Present(204 bytes, application/json;charset=utf-8) )
+2025-11-24T16:14:12.296337Z  INFO ThreadId(17) pact_verifier: Running setup provider state change handler 'products exist' for 'A valid request for all products'
+2025-11-24T16:14:12.299580Z  INFO ThreadId(17) pact_verifier: Running provider verification for 'A valid request for all products'
+2025-11-24T16:14:12.299616Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request to provider at http://127.0.0.1:9001/
+2025-11-24T16:14:12.299623Z  INFO ThreadId(17) pact_verifier::provider_client: Sending request HTTP Request ( method: GET, path: /api/products, query: None, headers: None, body: Missing )
+2025-11-24T16:14:12.299888Z  INFO ThreadId(17) pact_verifier::provider_client: Received response: HTTP Response ( status: 401, headers: Some({"date": ["Mon, 24 Nov 2025 16:14:12 GMT"], "content-length": ["0"], "server": ["Kestrel"]}), body: Empty )
+2025-11-24T16:14:12.300117Z  WARN ThreadId(17) pact_matching::metrics: 
+
+Please note:
+We are tracking events anonymously to gather important usage statistics like Pact version and operating system. To disable tracking, set the 'PACT_DO_NOT_TRACK' environment variable to 'true'.
+
+
+&#xD;
+[xUnit.net 00:00:00.60]   Finished:    tests&#xD;
+</StdOut>
+    </Output>
+    <RunInfos>
+      <RunInfo computerName="IN01-5B5YGC4" outcome="Error" timestamp="2025-11-24T21:44:12.3948831+05:30">
+        <Text>[xUnit.net 00:00:00.59]     tests.ProductTest.EnsureProviderApiHonoursPactWithConsumer [FAIL]</Text>
+      </RunInfo>
+    </RunInfos>
+  </ResultSummary>
+</TestRun>
