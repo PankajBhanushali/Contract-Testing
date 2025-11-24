@@ -1,0 +1,61 @@
+graph TD
+    subgraph Consumer Side
+        CS[Consumer Service] --> CT[Consumer Test Suite]
+        CT --> GCP[Generate Pact Contract]
+        GCP --> PCPB(Publish Contract to Pact Broker)
+        style CS fill:#b0e0e6,stroke:#333,stroke-width:2px
+        style CT fill:#b0e0e6,stroke:#333,stroke-width:2px
+        style GCP fill:#b0e0e6,stroke:#333,stroke-width:2px
+    end
+
+    subgraph Broker
+        PCPB --> PB[Pact Broker]
+        PVR --> PB
+        style PB fill:#add8e6,stroke:#333,stroke-width:2px
+    end
+
+    subgraph Provider Side
+        PS[Provider Service] --> PVT[Provider Verification Tests]
+        PVT --> PVR(Publish Verification Results)
+        style PS fill:#90ee90,stroke:#333,stroke-width:2px
+        style PVT fill:#90ee90,stroke:#333,stroke-width:2px
+        style PVR fill:#90ee90,stroke:#333,stroke-width:2px
+    end
+
+    subgraph CI/CD & Deployment
+        CVCI[Continuous Verification in CI] --> SD[Safe Deployment]
+        style CVCI fill:#d3d3d3,stroke:#333,stroke-width:2px
+        style SD fill:#d3d3d3,stroke:#333,stroke-width:2px
+    end
+
+    PB --- ConsumerToProviderFlow[Fetch Contract] --> PVT
+    PB --- ProviderToConsumerFlow[Verification Status] --> CVCI
+
+    linkStyle 0 stroke:#666,stroke-width:1.5px,fill:none,stroke-dasharray: 5 5;
+    linkStyle 1 stroke:#666,stroke-width:1.5px,fill:none,stroke-dasharray: 5 5;
+
+    classDef ConsumerClass fill:#e0f7fa,stroke:#00796b,stroke-width:2px;
+    classDef ProviderClass fill:#e8f5e9,stroke:#33691e,stroke-width:2px;
+    classDef BrokerClass fill:#e1f5fe,stroke:#2196f3,stroke-width:2px;
+    classDef CIDeployClass fill:#eceff1,stroke:#455a64,stroke-width:2px;
+
+    class CS ConsumerClass
+    class CT ConsumerClass
+    class GCP ConsumerClass
+
+    class PS ProviderClass
+    class PVT ProviderClass
+    class PVR ProviderClass
+
+    class PB BrokerClass
+
+    class CVCI CIDeployClass
+    class SD CIDeployClass
+
+    %% CS: The service that calls another service
+    %% CT: Defines expectations (request + response) for the provider
+    %% GCP: Pact file (pact.json) is produced from consumer tests
+    %% PCPB: Broker stores contracts and version history
+    %% PS: The service that receives the request
+    %% PVT: Provider fetches Pact file from broker and verifies against it
+    %% PVR: Provider publishes verification results back to broker
