@@ -1,0 +1,27 @@
+specmatic:
+  tests:
+    # Contract testing configuration
+    baseUrl: http://localhost:5000
+    
+    # API specification
+    spec: specs/products-api.yaml
+    
+    # Paths to validate
+    paths:
+      - /api/products
+      - /api/products/{id}
+      - /api/health
+    
+    # Report generation
+    reports:
+      format: json
+      output: ./reports/
+
+  providers:
+    - name: ProductService
+      url: http://localhost:5000
+      tests: Consumer/tests
+
+  consumers:
+    - name: ProductConsumer
+      tests: Consumer/tests

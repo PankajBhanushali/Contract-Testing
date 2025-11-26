@@ -1,0 +1,498 @@
+openapi: 3.0.0
+info:
+  title: Product Service API (OAuth Secured)
+  version: 2.0.0
+  description: |
+    A RESTful API for managing products with OAuth 2.0 security.
+    This API demonstrates Specmatic contract testing with OAuth for .NET applications.
+
+servers:
+  - url: http://localhost:5000
+    description: Local development server
+  - url: https://api.example.com
+    description: Production server
+
+paths:
+  /oauth/token:
+    post:
+      summary: OAuth 2.0 Token Endpoint
+      tags:
+        - OAuth
+      requestBody:
+        required: false
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                grant_type:
+                  type: string
+                  example: "client_credentials"
+                client_id:
+                  type: string
+                  example: "test-client"
+                client_secret:
+                  type: string
+                  example: "test-secret"
+                scope:
+                  type: string
+                  example: "read:products write:products"
+      responses:
+        '200':
+          description: Access token issued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  token_type:
+                    type: string
+                    example: "Bearer"
+                  expires_in:
+                    type: integer
+                    example: 3600
+
+  /api/health:
+    get:
+      summary: Health check endpoint (No authentication required)
+      tags:
+        - Health
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+
+  /api/products:
+    get:
+      summary: Get all products (Requires read:products scope)
+      tags:
+        - Products
+      security:
+        - oauth2:
+            - read:products
+      parameters:
+        - name: skip
+          in: query
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+          description: Number of records to skip
+        - name: take
+          in: query
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
+          description: Number of records to take
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid pagination parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - Missing or invalid token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      summary: Create a new product (Requires write:products scope)
+      tags:
+        - Products
+      security:
+        - oauth2:
+            - write:products
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProductRequest'
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+  /api/products/{id}:
+    get:
+      summary: Get a product by ID (Requires read:products scope)
+      tags:
+        - Products
+      security:
+        - oauth2:
+            - read:products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Product ID
+      responses:
+        '200':
+          description: Product found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Update a product (Requires write:products scope)
+      tags:
+        - Products
+      security:
+        - oauth2:
+            - write:products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Product ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProductRequest'
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Invalid request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+
+    delete:
+      summary: Delete a product (Requires write:products scope)
+      tags:
+        - Products
+      security:
+        - oauth2:
+            - write:products
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Product ID
+      responses:
+        '204':
+          description: Product deleted successfully
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+# Global security - OAuth required for most endpoints
+components:
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      description: "OAuth 2.0 Client Credentials flow for API security"
+      flows:
+        clientCredentials:
+          tokenUrl: http://localhost:5001/oauth/token
+          scopes:
+            read:products: "Read products"
+            write:products: "Create, update, delete products"
+
+  schemas:
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - price
+        - inStock
+        - createdAt
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+          description: Unique product identifier
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: "Laptop"
+          description: Product name
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+          example: "High-performance laptop with 16GB RAM"
+          description: Product description
+        price:
+          type: number
+          format: double
+          minimum: 0
+          exclusiveMinimum: true
+          example: 999.99
+          description: Product price (must be greater than 0)
+        discount:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          nullable: true
+          example: 10.5
+          description: Discount percentage (0-100)
+        inStock:
+          type: boolean
+          example: true
+          description: Whether product is in stock
+        quantity:
+          type: integer
+          minimum: 0
+          example: 50
+          description: Available quantity
+        category:
+          type: string
+          enum:
+            - Electronics
+            - Clothing
+            - Books
+            - Home
+            - Other
+          example: "Electronics"
+          description: Product category
+        createdAt:
+          type: string
+          format: date-time
+          example: "2024-01-15T10:30:00Z"
+          description: Creation timestamp
+
+    CreateProductRequest:
+      type: object
+      required:
+        - name
+        - price
+        - category
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: "New Product"
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        price:
+          type: number
+          format: double
+          minimum: 0
+          exclusiveMinimum: true
+          example: 99.99
+        discount:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          nullable: true
+        category:
+          type: string
+          enum:
+            - Electronics
+            - Clothing
+            - Books
+            - Home
+            - Other
+          example: "Electronics"
+
+    UpdateProductRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+        price:
+          type: number
+          format: double
+          minimum: 0
+          exclusiveMinimum: true
+        discount:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+          nullable: true
+        inStock:
+          type: boolean
+        quantity:
+          type: integer
+          minimum: 0
+        category:
+          type: string
+          enum:
+            - Electronics
+            - Clothing
+            - Books
+            - Home
+            - Other
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: "NOT_FOUND"
+        message:
+          type: string
+          example: "Product with ID 999 not found"
+
+    ValidationError:
+      type: object
+      required:
+        - code
+        - message
+        - errors
+      properties:
+        code:
+          type: string
+          example: "VALIDATION_ERROR"
+        message:
+          type: string
+          example: "Validation failed"
+        errors:
+          type: array
+          items:
+            type: object
+            required:
+              - field
+              - issue
+            properties:
+              field:
+                type: string
+                example: "price"
+              issue:
+                type: string
+                example: "Price must be greater than 0"

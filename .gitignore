@@ -25,3 +25,4 @@ yarn-error.log*
 # specmatic-contract-testing specific
 specmatic-contract-testing/node_modules/
 specmatic-contract-testing/package-lock.json
+/specmatic-contract-testing-net/Consumer/test_results.txt
