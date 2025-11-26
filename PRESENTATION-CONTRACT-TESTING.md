@@ -242,6 +242,7 @@ newman run contract-tests.json -e environment.json
 | **Language Support** | ✅ Multi-language | ✅ Any HTTP API |
 | **Debugging** | ⚠️  CLI/Logs | ✅ Visual UI |
 | **Team Familiarity** | ❌ Specialized | ✅ Common tool |
+| **Open Source** | ✅ Fully Open Source | ⚠️  Freemium (OSS core) |
 
 ---
 
