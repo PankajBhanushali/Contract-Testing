@@ -50,10 +50,10 @@
 1. **Consumer-Driven Contract Testing**
    - **Pact** (Most popular, multi-language)
    - Spring Cloud Contract
-   - Specmatic
 
-2. **API-First / Schema-Based**
+2. **API-First / Specification-Based**
    - **OpenAPI/Swagger validation** (Spec-driven)
+   - **Specmatic** (Spec-driven with auto test generation)
    - JSON Schema validators
    - Dredd, Prism, Schemathesis
 
@@ -65,10 +65,11 @@
    - VCR/WireMock
    - Traffic recording tools
 
-**Today's Focus**: Three Approaches
+**Today's Focus**: Four Approaches
 - **Pact**: Consumer-driven contracts
 - **Postman**: Collection-based testing
 - **OpenAPI**: Specification-driven validation
+- **Specmatic**: Automatic spec-driven testing with mock servers
 
 ---
 
@@ -404,27 +405,384 @@ dredd openapi.yaml http://localhost:5001
 
 ---
 
-## Slide 13: When to Use OpenAPI
+## Slide 14: Specmatic - Specification-Driven Testing with Auto-Generation
+
+### Approach
+> "Automatic API contract testing from OpenAPI specifications"
+
+### How It Works
+1. **Define OpenAPI specification** (specmatic.yaml)
+2. **Specmatic auto-generates test scenarios** from spec
+3. **Tests run against both consumer and provider**
+4. **Mock server automatically generated** from spec
+5. **Comprehensive reports generated** automatically
+
+### Key Differentiator from OpenAPI
+- Not just validation against spec
+- **Automatic test case generation** from spec examples
+- Built-in **mock server** (Prism-like)
+- **No manual test writing** required
+- Generates test scenarios for edge cases
+
+### Key Benefits
+- Zero manual test writing
+- Mock server for development
+- Multi-language support
+- Automatic documentation
+- Built-in CI/CD support
+- Contract verification reports
+
+### Example Test Generated from Spec
+```yaml
+# From spec: GET /api/products/{id}
+# Specmatic automatically generates:
+- Test 1: GET /api/products/1 → expects 200 + Product schema
+- Test 2: GET /api/products/999 → expects 404 + ErrorResponse
+- Test 3: Invalid ID type → validation error
+- Test 4: Boundary values → tested automatically
+```
+
+---
+
+## Slide 15: Specmatic Example Implementation
+
+### OpenAPI Spec (Source of Truth)
+```yaml
+openapi: 3.0.0
+info:
+  title: Product Service
+  version: 1.0.0
+
+paths:
+  /api/products:
+    get:
+      responses:
+        '200':
+          description: All products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+    
+    post:
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, price]
+              properties:
+                name:
+                  type: string
+                price:
+                  type: number
+                  minimum: 0
+      responses:
+        '201':
+          description: Product created
+        '400':
+          description: Invalid request
+
+components:
+  schemas:
+    Product:
+      type: object
+      required: [id, name, price]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        price:
+          type: number
+```
+
+### What Specmatic Auto-Generates
+```
+From this single spec, Specmatic generates:
+
+1. Provider Tests:
+   ✓ GET /api/products → 200 with array
+   ✓ POST /api/products (valid) → 201
+   ✓ POST /api/products (invalid) → 400
+   ✓ POST with negative price → 400
+   ✓ Required fields validation
+
+2. Mock Server:
+   GET /api/products → [sample product array]
+   POST /api/products → sample 201 response
+   
+3. Consumer Tests:
+   ✓ Handles 200 response
+   ✓ Parses Product schema
+   ✓ Handles 400 errors
+   
+4. Documentation:
+   HTML API docs from spec
+```
+
+---
+
+## Slide 16: Specmatic vs OpenAPI (In Detail)
+
+### Manual OpenAPI Validation
+```javascript
+// Developer writes validation tests
+it('should return 200', async () => {
+  const response = await fetch('/api/products');
+  expect(response.status).toBe(200);
+});
+
+// Must write many tests manually
+// Tests don't cover all edge cases
+// Test maintenance burden
+```
+
+### Specmatic Auto-Generation
+```yaml
+# Specmatic reads spec and generates all tests automatically
+# No test writing needed - tests generated from spec definition
+
+specmatic test --spec products-api.yaml
+# Output: 20+ tests run automatically
+# Covers happy path, error cases, edge cases
+```
+
+### Key Differences
+
+| Aspect | Manual OpenAPI | Specmatic |
+|--------|---|---|
+| **Test Writing** | Manual (tedious) | Automatic ✅ |
+| **Edge Cases** | Developer must think of them | Auto-generated ✅ |
+| **Maintenance** | High burden | Low - spec is source ✅ |
+| **Mock Server** | Separate tool needed | Built-in ✅ |
+| **Documentation** | Separate | From spec ✅ |
+| **Completeness** | Gaps likely | Comprehensive ✅ |
+
+---
+
+## Slide 17: Specmatic Architecture
+
+### Provider-Side Testing
+```
+1. Specmatic reads OpenAPI spec
+2. Generates test scenarios (happy + error paths)
+3. Sends requests to provider
+4. Validates responses match spec
+5. Reports coverage
+```
+
+### Consumer-Side Testing
+```
+1. Specmatic generates mock server from spec
+2. Consumer tests against mock server
+3. Specmatic validates consumer requests match spec
+4. Validates consumer handles responses correctly
+```
+
+### Workflow Diagram
+```
+┌─────────────────────────┐
+│  OpenAPI Specification  │
+│  (Single Source)        │
+└────────────┬────────────┘
+             │
+    ┌────────┴────────┐
+    ▼                 ▼
+┌──────────┐    ┌──────────┐
+│ Provider │    │  Mock    │
+│ Tests    │    │ Server   │
+│(Auto-gen)│    │(Auto-gen)│
+└──────────┘    └──────────┘
+    │                │
+    ▼                ▼
+┌─────────────────────────┐
+│  Coverage Report        │
+│  - All paths tested     │
+│  - Error cases handled  │
+│  - Schema validation    │
+└─────────────────────────┘
+```
+
+---
+
+## Slide 18: When to Use Specmatic
 
 ### ✅ Ideal Scenarios
-- **API-first development** with existing OpenAPI specs
-- **Multiple consumer teams** using same API
-- **Need comprehensive API documentation**
-- **Want built-in mock servers** (Prism)
-- **Legacy systems** with REST APIs
-- **Version compatibility** important
+- **API-first development** with OpenAPI specs
+- **Multiple consumer teams** consuming same API
+- **Want automatic testing** (no manual test writing)
+- **Need mock servers** for parallel development
+- **Comprehensive API documentation** important
+- **Strong governance** and contract enforcement
+- **REST APIs** with complex schemas
 
 ### 🎯 Real-World Use Cases
-- Public APIs with multiple consumers
-- REST API microservices platforms
-- API versioning strategies (v1/v2)
-- DevOps teams automating API validation
-- Organizations with API governance
+- Public APIs with SDKs for multiple languages
+- Microservices with strict contract requirements
+- Developer experiences (DX) paramount
+- API versioning and multi-version support
+- Documentation as primary deliverable
+- Zero-downtime deployments
 
-### Hybrid Approach
-- Use OpenAPI as spec, Pact for critical pairs
-- OpenAPI for documentation, Postman for testing
-- OpenAPI for validation, with business logic tests
+### Use Case Example: SaaS API
+```
+SaaS Provider
+  ├─ OpenAPI spec (source of truth)
+  ├─ Auto-generated tests
+  ├─ Mock server for SDK developers
+  ├─ Auto-generated documentation
+  └─ Client SDKs (auto-generated from spec)
+
+Client 1 (JavaScript)
+  └─ Generated SDK + auto tests
+
+Client 2 (Python)
+  └─ Generated SDK + auto tests
+
+Client 3 (Go)
+  └─ Generated SDK + auto tests
+```
+
+All clients validate against same spec ✅
+
+---
+
+## Slide 19: Specmatic Workshop - What We Built
+
+### Repository Structure
+```
+specmatic-contract-testing/
+├── specs/
+│   └── products-api.yaml          # OpenAPI 3.0 spec (source of truth)
+│
+├── provider/
+│   ├── src/
+│   │   └── index.js               # Express.js API server
+│   ├── Dockerfile
+│   └── package.json
+│
+├── consumer/
+│   ├── src/
+│   │   ├── api-client.js          # API client implementation
+│   │   └── contract.test.js       # Jest contract tests
+│   ├── jest.config.js
+│   └── package.json
+│
+├── specmatic.yaml                 # Specmatic config
+├── docker-compose.yml
+│
+└── Documentation
+    ├── README.md                  # Complete guide
+    ├── QUICK-START.md             # 5-minute setup
+    ├── ARCHITECTURE.md            # Concepts
+    ├── SETUP.md                   # Installation
+    ├── EXAMPLES.md                # Code examples
+    └── INDEX.md                   # Navigation
+```
+
+### What Tests Are Generated
+
+**Provider Tests** (Auto-generated by Specmatic):
+```
+✓ GET /api/products → 200 + array
+✓ POST /api/products (valid) → 201 + product
+✓ POST /api/products (invalid name) → 400
+✓ POST /api/products (negative price) → 400
+✓ GET /api/products/{id} → 200 + product
+✓ GET /api/products/999 → 404 + error
+✓ PUT /api/products/{id} → 200
+✓ DELETE /api/products/{id} → 204
++ Edge cases, boundary conditions, type validation
+```
+
+**Consumer Tests** (Against generated mock):
+```
+✓ Can get all products
+✓ Can parse product schema
+✓ Can handle 404 errors
+✓ Can create new product
+✓ Can update existing product
+✓ Can delete product
++ All scenarios from spec
+```
+
+---
+
+## Slide 20: Comparison Table - All Four Approaches
+
+| Feature | Pact | Postman | OpenAPI | Specmatic |
+|---------|------|---------|---------|-----------|
+| **Approach** | Consumer-driven | Collection-based | Spec-driven | Spec-driven + Auto |
+| **Test Generation** | Manual | Manual | Manual | ✅ Automatic |
+| **Mock Server** | ✅ Yes | ⚠️ Limited | ✅ Yes | ✅ Yes |
+| **Auto Test Gen** | ❌ No | ❌ No | ❌ No | ✅ Yes |
+| **Multi-Consumer** | ⚠️ Per pair | ⚠️ Shared | ✅ Single spec | ✅ Single spec |
+| **Documentation** | ❌ Separate | ⚠️ Limited | ✅ In spec | ✅ In spec |
+| **Setup Time** | High | Low | Medium | Medium |
+| **Learning Curve** | Steep | Low | Medium | Medium |
+| **Spec Required** | ❌ No | ❌ No | ✅ Yes | ✅ Yes |
+| **CI/CD Ready** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Language Support** | ✅ Multi | ✅ Any API | ✅ Any API | ✅ Any API |
+| **Maintenance** | Medium | High | Low | ✅ Lowest |
+| **Code Generation** | ❌ Limited | ❌ No | ⚠️ External | ✅ Built-in |
+
+---
+
+## Slide 21: Decision Framework - When to Use Each
+
+### Use Pact If:
+✅ Multiple service teams (microservices)  
+✅ Strong DevOps culture with automation  
+✅ Consumer independence critical  
+✅ Complex provider state management needed  
+✅ Already invested in Pact ecosystem  
+
+### Use Postman If:
+✅ Quick start needed (< 1 day)  
+✅ Team already knows Postman  
+✅ Exploratory testing priority  
+✅ Mixed functional + contract testing  
+✅ Limited technical resources  
+
+### Use OpenAPI If:
+✅ Spec exists or being created  
+✅ Need comprehensive documentation  
+✅ Multiple consumer versions  
+✅ Prefer specification as contract  
+✅ Mock servers essential  
+
+### Use Specmatic If:
+✅ Spec-first development  
+✅ Don't want to write tests manually  
+✅ Need automatic test generation  
+✅ Mock server is important  
+✅ Documentation is deliverable  
+✅ Multi-language SDKs needed  
+
+### Hybrid Approach (Recommended)
+```
+Layer 1: Specmatic
+├─ OpenAPI spec (source of truth)
+├─ Auto-generated tests
+├─ Mock servers for development
+└─ Auto-generated documentation
+
+Layer 2: Pact (for critical pairs)
+├─ Consumer-provider verification
+├─ Version compatibility
+└─ Deployment readiness
+
+Layer 3: Postman (for exploratory)
+├─ Functional testing
+├─ Performance testing
+└─ Manual validation
+
+Result: Comprehensive API contract coverage
+```
 
 ---
 
@@ -785,11 +1143,21 @@ openapi-contract-testing/
 ✅ Need spec-driven governance  
 ✅ Prefer specification over code
 
-### Use Multiple Approaches?
-🤔 **Hybrid Strategy**:
-- **OpenAPI** as source of truth (spec)
-- **Pact** for critical service contracts
-- **Postman** for exploratory/functional testing
+### Choose Specmatic If:
+✅ Spec-first development with OpenAPI  
+✅ Don't want to manually write tests  
+✅ Need automatic test generation  
+✅ Mock servers are essential  
+✅ Documentation is a deliverable  
+✅ Multi-language SDK support  
+✅ Comprehensive coverage important
+
+### Use All Four?
+🤔 **Multi-Layer Strategy**:
+- **Specmatic**: Automatic spec coverage
+- **Pact**: Critical service contracts
+- **Postman**: Exploratory/functional testing
+- **OpenAPI**: Source of truth & documentation
 - **Each tool excels** at different aspects
 
 ---
@@ -797,14 +1165,14 @@ openapi-contract-testing/
 ## Slide 23: Implementation Roadmap
 
 ### Phase 1: Foundation (Week 1-2)
-- [ ] Choose tool based on decision framework
-- [ ] Set up infrastructure (Pact Broker / Newman CI)
+- [ ] Choose tool(s) based on decision framework
+- [ ] Set up infrastructure (mocks, CI/CD)
 - [ ] Train pilot team
 - [ ] Select 1-2 service pairs for POC
 
 ### Phase 2: Pilot (Week 3-6)
 - [ ] Implement contracts for pilot services
-- [ ] Integrate with CI/CD
+- [ ] Integrate with CI/CD pipeline
 - [ ] Document learnings & patterns
 - [ ] Measure impact (bugs caught, time saved)
 
@@ -820,6 +1188,13 @@ openapi-contract-testing/
 - [ ] Track metrics (contract coverage, bugs prevented)
 - [ ] Continuous improvement
 
+### Specmatic-Specific Timeline
+- **Day 1**: Write OpenAPI spec
+- **Day 2**: Run Specmatic tests (auto-generated)
+- **Day 3**: Generate mock server
+- **Day 4**: Distribute to consumers
+- **Day 5**: Integrate into CI/CD
+
 ---
 
 ## Slide 24: Key Takeaways
@@ -833,13 +1208,24 @@ openapi-contract-testing/
 ### Tool Selection Matters
 - **Pact**: Best for mature microservices architectures
 - **Postman**: Best for simpler setups or quick wins
+- **OpenAPI**: Best for spec-first and documentation
+- **Specmatic**: Best for automatic testing and mock servers
 - **Context is key**: No one-size-fits-all solution
 
 ### Success Factors
 ✅ Team buy-in and training  
 ✅ CI/CD integration  
 ✅ Clear governance  
-✅ Start small, scale gradually
+✅ Start small, scale gradually  
+✅ Choose right tool for context
+
+### The Future: Multi-Tool Approach
+Expect to use multiple tools together:
+```
+Specmatic (Auto tests) + Pact (Contracts) + 
+Postman (Exploratory) + OpenAPI (Spec)
+= Comprehensive API Quality
+```
 
 ---
 
@@ -864,9 +1250,15 @@ openapi-contract-testing/
 - **Spectral Linter**: https://meta.stoplight.io/docs/spectral
 - **Example**: `openapi-contract-testing/` directory
 
+### Specmatic Resources
+- **Docs**: https://specmatic.io
+- **GitHub**: https://github.com/znsio/specmatic
+- **Community**: GitHub discussions
+- **Example**: `specmatic-contract-testing/` directory (NEW!)
+
 ### Getting Started
-1. Review all three examples in this repository
-2. Run the demos locally (Pact, Postman, OpenAPI)
+1. Review all four examples in this repository
+2. Run the demos locally (Pact, Postman, OpenAPI, Specmatic)
 3. Choose primary approach for your team
 4. Consider hybrid approach as you scale
 5. Start with one service pair
@@ -881,17 +1273,20 @@ openapi-contract-testing/
 1. **"Do we need Pact Broker or can we use Git?"**
    - Answer: Git works for small teams, Broker enables scale
 
-2. **"Can Pact test performance?"**
-   - Answer: No - contract tests validate structure, not performance
+2. **"Can Specmatic auto-generate all my tests?"**
+   - Answer: Yes - from spec definition automatically
 
 3. **"What about GraphQL/gRPC?"**
-   - Answer: Both Pact and Postman support these (with plugins/setup)
+   - Answer: Pact and Postman support these (with plugins/setup)
 
 4. **"How do we version contracts?"**
-   - Answer: Pact Broker handles this; Postman needs Git/tagging
+   - Answer: Pact Broker, Git/tagging, or spec versioning
 
 5. **"What about testing third-party APIs we don't control?"**
    - Answer: Postman better suited; Pact designed for internal APIs
+
+6. **"Should we use all four tools?"**
+   - Answer: Hybrid approach recommended - each has strengths
 
 ---
 
@@ -912,9 +1307,15 @@ openapi-contract-testing/
 3. Show Newman CLI execution
 4. Review test results
 
-**Demo 3: Debugging** (5 minutes)
+**Demo 3: Specmatic Workflow** (5 minutes)
+1. Show OpenAPI spec
+2. Run Specmatic tests (auto-generated)
+3. Generate mock server
+4. Show generated documentation
+
+**Demo 4: Debugging** (5 minutes)
 - Show how to troubleshoot common issues
-- Port conflicts, missing headers, etc.
+- Port conflicts, missing headers, schema validation, etc.
 
 ---
 
@@ -930,6 +1331,7 @@ openapi-contract-testing/
 ✅ Working Pact example (Consumer + Provider)
 ✅ Working Postman example (Consumer + Provider)  
 ✅ Working OpenAPI example (Consumer + Provider + Spec)
+✅ Working Specmatic example (Consumer + Provider + Auto Tests) ⭐ NEW
 ✅ Troubleshooting documentation
 ✅ Comparison matrices
 ✅ This presentation
@@ -941,24 +1343,30 @@ git clone <your-repo-url>
 cd contract-testing
 ```
 
+### Four Approaches, One Goal
+**Pact** + **Postman** + **OpenAPI** + **Specmatic**
+= Comprehensive API Contract Coverage
+
+**Start small, scale gradually, choose your tools wisely!**
+
 ---
 
 ## Additional Slides (Backup)
 
-### Backup Slide 1: Detailed Pact Flow Diagram
-[Insert detailed sequence diagram showing exact request/response flow]
+### Backup Slide 1: Detailed Specmatic Flow Diagram
+[Insert detailed sequence diagram showing auto test generation flow]
 
-### Backup Slide 2: Postman Collection Structure
-[Insert breakdown of collection JSON structure and test script anatomy]
+### Backup Slide 2: Cost Analysis Spreadsheet
+[Insert TCO comparison table with all four tools]
 
-### Backup Slide 3: Cost Analysis Spreadsheet
-[Insert TCO comparison table with detailed cost breakdowns]
-
-### Backup Slide 4: Alternative Tools
+### Backup Slide 3: Alternative Tools
 - Spring Cloud Contract (Java ecosystem)
-- Specmatic (OpenAPI-driven)
-- Dredd (API Blueprint validation)
-- REST-assured (Java testing library)
+- Schemathesis (GraphQL/REST auto testing)
+- VCR (Record & replay)
+- WireMock (Mock server)
+
+### Backup Slide 4: Specmatic vs Others in Detail
+[Insert detailed comparison matrix with 20+ dimensions]
 
 ---
 

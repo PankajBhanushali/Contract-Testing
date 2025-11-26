@@ -12,5 +12,16 @@
 **/bin
 **/obj
 
-## pact files
+## pact files
 pacts
+
+# Node.js - specmatic and other Node projects
+node_modules/
+package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# specmatic-contract-testing specific
+specmatic-contract-testing/node_modules/
+specmatic-contract-testing/package-lock.json

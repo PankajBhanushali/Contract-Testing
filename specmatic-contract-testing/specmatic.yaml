@@ -1,0 +1,36 @@
+# Specmatic Configuration
+# See: https://specmatic.io/documentation
+
+specmaticConfig:
+  # Specification files
+  specificationPath: "specs"
+  
+  # Base URL for testing
+  baseURL: "http://localhost:8080"
+  
+  # API to contract type mapping
+  apiSpecifications:
+    - specFile: "products-api.yaml"
+      type: "openapi"
+      baseURL: "http://localhost:8080"
+  
+  # Test configuration
+  testing:
+    # Timeout for API calls (milliseconds)
+    timeout: 10000
+    
+    # Retry configuration
+    retries: 3
+    
+    # Enable detailed logging
+    verbose: true
+  
+  # Mock server configuration
+  mockServer:
+    enabled: true
+    port: 9000
+  
+  # Report generation
+  reports:
+    format: "html"
+    outputPath: "reports"
