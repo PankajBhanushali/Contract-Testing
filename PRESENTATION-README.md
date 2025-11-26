@@ -1,15 +1,16 @@
 # Contract Testing Presentation Materials
 
 ## Overview
-This directory contains complete presentation materials comparing Pact and Postman approaches to contract testing, with working examples of both.
+This directory contains complete presentation materials covering three approaches to contract testing: Pact, Postman, and OpenAPI - with working examples of all three.
 
 ## Contents
 
 ### 📊 Presentation
-- **`PRESENTATION-CONTRACT-TESTING.md`**: Complete slide deck (28 slides + backup)
+- **`PRESENTATION-CONTRACT-TESTING.md`**: Complete slide deck (28+ slides + backup)
   - Introduction to contract testing
-  - Detailed comparison: Pact vs Postman
-  - Real-world examples and use cases
+  - Three approaches: Pact vs Postman vs OpenAPI
+  - Detailed comparisons and use cases
+  - Real-world examples
   - Best practices and pitfalls
   - Implementation roadmap
   - Decision framework
@@ -26,82 +27,98 @@ This directory contains complete presentation materials comparing Pact and Postm
 
 #### Pact Example (Full Workshop)
 ```
-Consumer/
-├── src/ApiClient.cs           # HTTP client implementation
-└── tests/ApiTest.cs           # Pact consumer tests (generates contracts)
-
-Provider/
-├── src/
-│   ├── ProductsController.cs  # API implementation
-│   └── Startup.cs             # Middleware configuration
-└── tests/
-    ├── ProductTest.cs         # Pact provider verification
-    └── Middleware/
-        ├── ProviderStateMiddleware.cs      # Test data setup
-        └── AuthTokenRequestFilter.cs       # Auth token handling
-
-pacts/
-└── ApiClient-ProductService.json  # Generated contract
+pact-contract-testing/
+├── Consumer/
+│   ├── src/ApiClient.cs           # HTTP client implementation
+│   └── tests/ApiTest.cs           # Pact consumer tests (generates contracts)
+├── Provider/
+│   ├── src/ProductsController.cs  # API implementation
+│   └── tests/
+│       ├── ProductTest.cs         # Pact provider verification
+│       └── Middleware/
+│           ├── ProviderStateMiddleware.cs
+│           └── AuthTokenRequestFilter.cs
+└── pacts/
+    └── ApiClient-ProductService.json
 ```
 
 #### Postman Example
 ```
 postman-contract-testing/
-├── Provider/src/              # Same API, simplified version
-├── Consumer/src/              # Same client, simplified version
+├── Provider/src/              # ASP.NET Core API
+├── Consumer/src/              # Consumer client
+├── Consumer/tests/            # xUnit consumer tests
 └── postman-collections/
     ├── Product-API-Contract-Tests.postman_collection.json
     └── Product-API-Environment.postman_environment.json
 ```
 
+#### OpenAPI Example (NEW!)
+```
+openapi-contract-testing/
+├── openapi.yaml              # OpenAPI 3.0 spec (single source of truth)
+├── docker-compose.yml        # Docker Compose setup
+├── provider/                 # Node.js Provider API (v1 & v2 support)
+└── consumer/                 # Jest Consumer Tests
+    ├── v1-client.js         # SF 17.1 client
+    ├── v2-client.js         # SF 18.1 client
+    └── tests/
+        ├── v1.test.js       # 7 v1 tests
+        └── v2.test.js       # 9 v2 tests
+```
+
 ### 📖 Documentation
-- **Consumer tests fix steps**: `Consumer/tests/consumer-tests-fix-steps.md`
+- **Consumer tests fix steps**: `pact-contract-testing/Consumer/tests/consumer-tests-fix-steps.md`
 - **Postman setup guide**: `postman-contract-testing/README.md`
-- **Workshop learning objectives**: `LEARNING.md`
+- **OpenAPI quick start**: `openapi-contract-testing/QUICK-START.md`
+- **OpenAPI detailed guide**: `openapi-contract-testing/OPENAPI-CONTRACT-TESTING.md`
+- **Workshop learning objectives**: `pact-contract-testing/LEARNING.md`
 
 ## How to Use This Presentation
 
 ### For Presenters
 
-1. **Review the Materials** (30 minutes)
+1. **Review the Materials** (45 minutes)
    - Read through `PRESENTATION-CONTRACT-TESTING.md`
-   - Familiarize yourself with both examples
-   - Review the decision framework (Slide 22)
+   - Familiarize yourself with all three examples
+   - Review the decision framework
 
-2. **Customize for Your Audience** (1 hour)
+2. **Customize for Your Audience** (1-2 hours)
    - Add company-specific context
    - Adjust technical depth
-   - Select relevant slides (core deck is 26 slides)
-   - Prepare demos (see below)
+   - Select relevant slides (core deck covers 3 approaches)
+   - Prepare demos
 
-3. **Prepare Demos** (1 hour)
-   - Set up both Pact and Postman examples
-   - Practice running tests
-   - Prepare breakage scenarios to demonstrate failures
+3. **Prepare Demos** (1.5-2 hours)
+   - Set up all three examples
+   - Practice running tests for each
+   - Prepare failure scenarios
+   - Time each demo
 
 ### For Decision Makers
 
-**Quick Path** (15 minutes):
-1. Read Slides 1-4: Introduction & context
-2. Read Slide 10: Side-by-side comparison
-3. Read Slide 22: Decision framework
-4. Read `CONTRACT-TESTING-QUICK-REFERENCE.md`: ROI section
+**Quick Path** (20 minutes):
+1. Read Slides 1-4: Introduction & solutions landscape
+2. Read Slide 11: Side-by-side comparison (updated with OpenAPI)
+3. Read Slide 22: Decision framework (updated)
+4. Read `CONTRACT-TESTING-QUICK-REFERENCE.md`
 
-**Deep Dive** (2 hours):
+**Deep Dive** (3 hours):
 1. Read full presentation
-2. Run both demos
-3. Review cost-benefit analysis (Slide 17)
-4. Consider implementation roadmap (Slide 23)
+2. Run all three demos
+3. Review cost-benefit analysis
+4. Study the three approaches
+5. Consider hybrid strategy
 
 ### For Engineers
 
-**Implementation Path** (4-6 hours):
-1. Read Slides 5-9: Technical details
-2. Set up and run Pact example
-3. Set up and run Postman example
-4. Review pitfalls (Slide 14)
-5. Study code patterns in examples
-6. Experiment with modifications
+**Implementation Path** (6-8 hours):
+1. Read Slides 5-16: Technical details
+2. Set up and run all three examples
+3. Review pitfalls and best practices
+4. Study code patterns
+5. Experiment with modifications
+6. Choose approach for your project
 
 ## Running the Examples
 
@@ -109,16 +126,18 @@ postman-contract-testing/
 
 **Prerequisites**:
 - .NET 8 SDK
-- Port 9123 available (or modify in `ApiTest.cs`)
+- Port 9123 available
 
 **Steps**:
 ```powershell
+cd pact-contract-testing
+
 # Terminal 1: Run Provider
 cd Provider\src
 dotnet restore
 dotnet run
 
-# Terminal 2: Run Consumer Tests (generates pact)
+# Terminal 2: Run Consumer Tests
 cd Consumer\tests
 dotnet test
 
@@ -127,63 +146,89 @@ cd Provider\tests
 dotnet test
 ```
 
-**Expected Output**:
-- Consumer tests: ✅ 5 passed, generates pact file
-- Provider tests: ✅ 1 passed (5 interactions verified)
-
-**Troubleshooting**: See `Consumer/tests/consumer-tests-fix-steps.md`
+**Expected**: Consumer tests pass (5/5), generates pact file → Provider verification passes
 
 ### Postman Example
 
 **Prerequisites**:
 - .NET 8 SDK
-- Postman Desktop OR Newman CLI (`npm install -g newman`)
+- Newman CLI or Postman Desktop
 
 **Steps**:
 ```powershell
-# Start Provider
-cd postman-contract-testing\Provider\src
-dotnet restore
+cd postman-contract-testing
+
+# Terminal 1: Run Provider
+cd Provider\src
 dotnet run
 
-# Option A: Postman GUI
-# 1. Import collection from postman-collections/
-# 2. Import environment
-# 3. Run collection
+# Terminal 2: Run Consumer Tests
+cd Consumer\tests
+dotnet test
 
-# Option B: Newman CLI
-cd postman-contract-testing
+# Terminal 3: Run Postman Tests
+cd ..
 newman run postman-collections/Product-API-Contract-Tests.postman_collection.json `
   -e postman-collections/Product-API-Environment.postman_environment.json
 ```
 
-**Expected Output**:
-- 3 test scenarios, all passing
-- Response time metrics
-- HTML report (if using `--reporter-html-export`)
+**Expected**: All 3 endpoints tested, 10/11 assertions pass ✅
+
+### OpenAPI Example (NEW!)
+
+**Prerequisites**:
+- Node.js 18+
+- Docker & Docker Compose (or local Node.js)
+
+**Steps**:
+```powershell
+cd openapi-contract-testing
+
+# Option A: Docker Compose
+docker-compose up -d
+sleep 5
+
+# Option B: Manual
+cd provider
+npm install
+npm start
+
+# Terminal 2: Run Consumer Tests
+cd consumer
+npm install
+npm test
+```
+
+**Expected**: All 16 tests pass ✅ (7 v1 + 9 v2)
+
+**Features**:
+- Single OpenAPI spec for both v1 & v2
+- SF 17.1 and SF 18.1 compatibility
+- Schema validation
+- Real-world versioning scenario
 
 ## Presentation Delivery Guide
 
-### Recommended Format (60 minutes)
+### Recommended Format (75 minutes)
 
 **Section 1: Introduction** (10 min)
-- Slides 1-4: Problem statement & contract testing overview
-- Engage audience: "Who has integration test pain?"
+- Slides 1-4: Problem statement & solutions landscape
+- Engage: "Which approach fits your team?"
 
-**Section 2: Solutions** (15 min)
-- Slides 5-9: Pact deep dive
-- Slides 8-9: Postman deep dive
-- Show code examples from slides
+**Section 2: Solution Deep Dives** (20 min)
+- Slides 5-10: Pact (consumer-driven)
+- Slides 10-12: Postman (collection-based)
+- Slides 10-13: OpenAPI (spec-driven)
 
-**Section 3: Comparison** (10 min)
-- Slide 10: Feature comparison
-- Slides 11-12: When to use each
+**Section 3: Comparison & Decision** (15 min)
+- Slide 11: Feature comparison matrix
+- Slides 12-14: When to use each
 - Slide 22: Decision framework
 
-**Section 4: Demo** (15 min)
-- Live demo: Pact workflow (10 min)
-- Live demo: Postman workflow (5 min)
-- Show breaking changes and failures
+**Section 4: Demos** (20 min)
+- Demo 1: Pact workflow (8 min)
+- Demo 2: Postman workflow (6 min)
+- Demo 3: OpenAPI workflow (6 min)
 
 **Section 5: Wrap-up** (10 min)
 - Slide 23: Implementation roadmap
@@ -192,93 +237,111 @@ newman run postman-collections/Product-API-Contract-Tests.postman_collection.jso
 
 ### Alternative Formats
 
-**Workshop Format** (3-4 hours):
+**Executive Briefing** (30 minutes):
+- Slides 1-4, 11, 17, 22, 24
+- Skip technical details
+- Focus on ROI and decision criteria
+
+**Technical Deep Dive** (120 minutes):
+- Detailed exploration of all three
+- Extended demo time (2-3 min each)
+- Live coding/modification
+- Architecture discussion
+
+**Workshop Format** (4-5 hours):
 - Include hands-on exercises
 - Have attendees run examples
-- Group discussion on team's specific needs
-- Create action plan
+- Group decision-making
+- Create action plan for team
 
-**Executive Briefing** (30 minutes):
-- Slides 1-4, 10, 17, 22, 24 only
-- Focus on ROI and decision criteria
-- Skip technical details
+### Three Approaches Summary
 
-**Technical Deep Dive** (90 minutes):
-- Focus on Slides 5-16
-- Extended demo time
-- Live coding session
-- Architecture patterns discussion
+| Aspect | Pact | Postman | OpenAPI |
+|--------|------|---------|---------|
+| **Type** | Consumer-Driven | Collection-Based | Spec-Driven |
+| **Best For** | Microservices | Quick Start | API Documentation |
+| **Setup Time** | 1-2 weeks | 1-2 days | 3-5 days |
+| **Learning Curve** | Steep | Gentle | Medium |
+| **Mock Server** | Built-in | ❌ | Prism (OSS) |
+| **Documentation** | No | Limited | Built-in ✅ |
+| **Versioning** | Pact Broker | Manual | In spec |
 
 ## Customization Tips
 
 ### Adding Company Context
 1. Replace generic examples with your services
-2. Add your service architecture diagram
-3. Include actual pain points from your team
-4. Reference your CI/CD setup
+2. Add your architecture diagram
+3. Reference your actual pain points
+4. Show your CI/CD setup
 
 ### Adjusting Technical Depth
-- **Less technical**: Focus on "What" and "Why", skip code details
-- **More technical**: Add backup slides, detailed code walkthrough
-- **Mixed audience**: Create separate tracks or appendices
+- **Less technical**: Focus on principles, skip code
+- **More technical**: Extended code walkthrough
+- **Mixed audience**: Separate tracks or appendices
 
 ### Time Constraints
-- **15 min**: Slides 1-4, 10, 22, 24
-- **30 min**: Add 17, 23, brief demo
-- **45 min**: Full core deck, short demo
-- **60 min**: Full deck with demos
-- **90+ min**: Workshop format with hands-on
+- **20 min**: Slides 1-4, 11, 22
+- **45 min**: Add demos (quick overview each)
+- **75 min**: Full core deck with complete demos
+- **120+ min**: Deep dive with hands-on workshop
 
 ## FAQ for Presenters
 
 **Q: Which tool should I recommend?**
-A: Use the decision framework (Slide 22). For most teams starting out: Postman. For mature microservices: Pact.
+A: Use Decision Framework (Slide 22):
+- Start with **Postman** for quick wins
+- Graduate to **OpenAPI** for governance
+- Add **Pact** for critical service pairs
 
-**Q: What if my organization already uses [other tool]?**
-A: Acknowledge it, compare to Pact/Postman, focus on contract testing principles that apply universally.
+**Q: Should we use all three?**
+A: **Hybrid approach recommended**:
+- OpenAPI as specification source
+- Pact for strategic contracts
+- Postman for functional/exploratory testing
 
-**Q: How do I handle pushback on learning curve?**
-A: Emphasize ROI timeline (Slide 17), start small approach (Slide 23), and hybrid option (Slide 22).
+**Q: How do I handle mixed technical audiences?**
+A: Three-track approach:
+- Executive track: ROI, decision criteria
+- Architecture track: Patterns, governance
+- Implementation track: Hands-on coding
 
-**Q: Should I demo live or use screenshots?**
-A: Live for credibility, but have backup recordings/screenshots in case of technical issues.
-
-**Q: What if someone asks about GraphQL/gRPC?**
-A: Both Pact and Postman support these (mention plugins/setup differences), but keep focus on HTTP for clarity.
+**Q: Live demos or backup recordings?**
+A: Live for credibility, but have backups for:
+- Network issues
+- Port conflicts
+- Setup problems
+- Time overruns
 
 ## Post-Presentation Resources
 
 **For Follow-up**:
-- Share this repository link
+- Share this repository
 - Provide quick reference guide
-- Offer office hours or Slack channel
-- Create pilot project team
+- Offer office hours
+- Create pilot project
 
 **Metrics to Track** (if implementing):
 - Time to first contract test
-- Contract coverage over time
-- Bugs caught by contract tests
+- Contract coverage %
+- Bugs caught by tests
 - Integration test reduction
 - Developer satisfaction
 
-## Contributing
-
-Found an issue or have suggestions?
-- Update presentation materials
-- Add more examples
-- Share success stories
-- Improve documentation
-
 ## Version History
 
-- **v1.0** (November 2025): Initial presentation materials
-  - 28-slide deck with comparisons
-  - Working Pact and Postman examples
+- **v2.0** (November 2025): Added OpenAPI approach
+  - 28+ slide deck covering three approaches
+  - New OpenAPI example (consumer + provider + tests)
+  - Updated decision framework
+  - Hybrid strategy guidance
+  
+- **v1.0** (November 2025): Initial materials
+  - Pact and Postman examples
+  - 26-slide comparison deck
   - Quick reference guide
-  - Comprehensive documentation
 
 ---
 
-**Presentation Author**: Generated for pact-workshop-dotnet  
-**Last Updated**: November 24, 2025  
+**Last Updated**: November 26, 2025  
+**Presentation Author**: Generated for Contract Testing Repository  
 **License**: Same as main repository

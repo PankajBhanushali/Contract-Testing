@@ -9,9 +9,9 @@ backgroundImage: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000
 
 <!-- _class: lead -->
 # Contract Testing
-## Pact vs Postman
+## Pact vs Postman vs OpenAPI
 
-### A Comprehensive Comparison
+### A Comprehensive Comparison of Three Approaches
 
 ---
 
@@ -59,14 +59,14 @@ backgroundImage: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000
 - Spring Cloud Contract
 - Specmatic
 
-### API-First / Schema-Based
-- OpenAPI/Swagger validation
+### API-First / Specification-Based
+- **OpenAPI/Swagger validation**
 - JSON Schema validators
-- **Postman Contract Testing**
+- Dredd, Prism, Schemathesis
 
-### Record & Replay
-- VCR/WireMock
-- Traffic recording tools
+### Collection-Based Testing
+- **Postman Contract Testing**
+- Manual test scripts
 
 ---
 
@@ -196,6 +196,28 @@ public void EnsureProviderHonoursPact()
 
 ---
 
+## OpenAPI: Specification-Driven Validation
+
+### Approach
+> "Define contract as OpenAPI spec, validate both consumer and provider against it"
+
+### How It Works
+1. Create OpenAPI specification (openapi.yaml)
+2. Consumer validates requests/responses against spec
+3. Provider generates responses per spec
+4. Automated testing tools (Dredd, Prism, Schemathesis)
+5. Single source of truth for entire contract
+
+### Key Benefits
+- ✅ Single source of truth (OpenAPI spec)
+- ✅ Built-in API documentation
+- ✅ Multi-consumer support
+- ✅ Schema validation built-in
+- ✅ Mock servers (Prism)
+- ✅ API versioning support
+
+---
+
 ## Postman Contract Test Example
 
 ```javascript
@@ -219,20 +241,57 @@ newman run contract-tests.json -e environment.json
 
 ---
 
+## OpenAPI Contract Test Example
+
+```yaml
+# openapi.yaml - Single source of truth
+openapi: 3.0.0
+info:
+  title: Users API
+  version: 1.0.0
+
+paths:
+  /users:
+    get:
+      parameters:
+        - name: apiVersion
+          in: query
+          schema:
+            type: string
+            enum: ["1", "2"]
+      responses:
+        "200":
+          description: Users list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsersResponse"
+```
+
+**Validate with Dredd**:
+```bash
+dredd openapi.yaml http://localhost:5001
+# Tests: 16 passing ✅
+```
+
+---
+
 ## Side-by-Side Comparison
 
-| Feature | Pact | Postman |
-|---------|------|---------|
-| Setup Complexity | Medium-High | Low |
-| Learning Curve | Steep | Gentle |
-| Mock Server | ✅ Built-in | ❌ No |
-| Provider States | ✅ Built-in | ❌ Manual |
-| Contract Auto-Gen | ✅ Yes | ❌ No |
-| Pact Broker | ✅ Yes | ⚠️  Manual |
-| CI/CD Integration | ✅ Excellent | ✅ Excellent |
-| Multi-language | ✅ Yes | ✅ Any HTTP |
-| Debugging | ⚠️  CLI/Logs | ✅ Visual UI |
-| Team Familiarity | ❌ Specialized | ✅ Common |
+| Feature | Pact | Postman | OpenAPI |
+|---------|------|---------|---------|
+| Setup Complexity | Medium-High | Low | Medium |
+| Learning Curve | Steep | Gentle | Medium |
+| Mock Server | ✅ Built-in | ❌ No | ✅ Prism |
+| Provider States | ✅ Built-in | ❌ Manual | ❌ Manual |
+| Contract Auto-Gen | ✅ Yes | ❌ No | ❌ No |
+| Pact Broker | ✅ Yes | ⚠️  Manual | ✅ In spec |
+| CI/CD Integration | ✅ Excellent | ✅ Excellent | ✅ Excellent |
+| Multi-language | ✅ Yes | ✅ Any HTTP | ✅ Any HTTP |
+| API Documentation | ❌ No | ⚠️  Limited | ✅ Built-in |
+| Debugging | ⚠️  CLI/Logs | ✅ Visual UI | ⚠️  CLI/Visual |
+| Team Familiarity | ❌ Specialized | ✅ Common | ⚠️  Dev-friendly |
+| Open Source | ✅ Fully OSS | ⚠️  Freemium | ✅ Fully OSS |
 
 ---
 
@@ -272,6 +331,25 @@ newman run contract-tests.json -e environment.json
 
 ---
 
+## When to Use OpenAPI
+
+### ✅ Ideal Scenarios
+- API-first development with existing specs
+- Multiple consumer teams using same API
+- Need comprehensive API documentation
+- Want built-in mock servers (Prism)
+- Legacy REST API systems
+- API versioning is important
+
+### 🎯 Real-World Use Cases
+- Public APIs with multiple consumers
+- Microservices platforms with REST APIs
+- API versioning (v1/v2) strategies
+- Organizations with API governance
+- DevOps automating API validation
+
+---
+
 ## Decision Framework
 
 ### Choose Pact If:
@@ -290,20 +368,28 @@ newman run contract-tests.json -e environment.json
 - ✅ Limited technical resources
 - ✅ Provider-driven development
 
+### Choose OpenAPI If:
+- ✅ API-first development
+- ✅ Need built-in documentation
+- ✅ Want mock servers (Prism)
+- ✅ Multiple consumer versions
+- ✅ Need spec-driven governance
+- ✅ Prefer specification over code
+
 ---
 
-## Hybrid Approach (Use Both!)
+## Hybrid Approach (Use All Three!)
 
-### Recommended Setup
+### Recommended Strategy
+- **OpenAPI**: Specification (source of truth)
 - **Pact**: Core service contracts (critical paths)
 - **Postman**: Exploratory & functional testing
-- **Postman**: Third-party API validation
 
 ### Benefits
-- ✅ Flexibility in approach
-- ✅ Each tool used where it excels
-- ✅ Team can choose preferred method
-- ✅ Gradual migration possible
+- ✅ Flexibility - each tool where it excels
+- ✅ Governance - spec-driven compliance
+- ✅ Team choice - different preferences
+- ✅ Progressive - migrate gradually
 
 ---
 
@@ -367,6 +453,12 @@ newman run contract-tests.json -e environment.json
 - **Newman**: https://www.npmjs.com/package/newman
 - **Example**: Repository examples
 - **Community**: Postman forums
+
+### OpenAPI Resources
+- **Docs**: https://spec.openapis.org
+- **Prism**: https://stoplight.io/prism/
+- **Dredd**: https://dredd.org/
+- **Example**: Repository examples
 
 ---
 
@@ -457,6 +549,7 @@ Reach out for implementation guidance
 ### Repository Contents
 - ✅ Working Pact example (Consumer + Provider)
 - ✅ Working Postman example (Consumer + Provider)
+- ✅ Working OpenAPI example (Consumer + Provider + Spec)
 - ✅ Troubleshooting documentation
 - ✅ Comparison matrices
 - ✅ This presentation

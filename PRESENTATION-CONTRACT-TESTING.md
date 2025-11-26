@@ -53,15 +53,22 @@
    - Specmatic
 
 2. **API-First / Schema-Based**
-   - OpenAPI/Swagger validation
+   - **OpenAPI/Swagger validation** (Spec-driven)
    - JSON Schema validators
-   - Postman Contract Testing
+   - Dredd, Prism, Schemathesis
 
-3. **Record & Replay**
+3. **Collection/Manual Testing**
+   - Postman Contract Testing
+   - Manual test scripts
+
+4. **Record & Replay**
    - VCR/WireMock
    - Traffic recording tools
 
-**Today's Focus**: Pact (consumer-driven) vs Postman (API-first)
+**Today's Focus**: Three Approaches
+- **Pact**: Consumer-driven contracts
+- **Postman**: Collection-based testing
+- **OpenAPI**: Specification-driven validation
 
 ---
 
@@ -228,21 +235,136 @@ newman run contract-tests.json -e environment.json
 
 ---
 
+## Slide 10: OpenAPI - Specification-Driven Contract Testing
+
+### Approach
+> "Define contract as OpenAPI spec, validate both consumer and provider against it"
+
+### How It Works
+1. **Create OpenAPI specification** (openapi.yaml)
+2. **Consumer validates requests/responses** against spec
+3. **Provider generates responses** per spec
+4. **Automated testing tools** (Dredd, Prism, Schemathesis)
+5. **Single source of truth** for contract
+
+### Key Benefits
+- Single source of truth (OpenAPI spec)
+- Includes API documentation
+- Multi-consumer support (same spec)
+- Built-in schema validation
+- Tools ecosystem (mock servers, code generation)
+- Supports API versioning
+
+### Example: OpenAPI Spec
+```yaml
+openapi: 3.0.0
+info:
+  title: Users API
+  version: 1.0.0
+
+paths:
+  /users:
+    get:
+      parameters:
+        - name: apiVersion
+          in: query
+          schema:
+            type: string
+            enum: ["1", "2"]
+      responses:
+        "200":
+          description: Users list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UsersResponse"
+
+components:
+  schemas:
+    UsersResponse:
+      type: object
+      required:
+        - users
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+    
+    User:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+```
+
+---
+
+## Slide 11: OpenAPI Validation - Consumer & Provider
+
+### Consumer-Side Validation
+```javascript
+// Validate request before sending
+const valid = await validator.ValidateRequest(
+  'GET', 
+  '/users',
+  { apiVersion: '1' }
+);
+
+// Make API call
+const response = await fetch('/users?apiVersion=1');
+
+// Validate response against spec
+const responseValid = await validator.ValidateResponse(
+  'GET',
+  '/users',
+  200,
+  response.json()
+);
+```
+
+### Provider-Side Validation
+```javascript
+// Middleware to validate requests/responses
+app.use(openApiValidationMiddleware);
+
+app.get('/users', (req, res) => {
+  // Provider validates request against spec
+  // Generate response per spec
+  // Validate response before sending
+  res.json({ users: [...] });
+});
+```
+
+### Automated Testing with Dredd
+```bash
+dredd openapi.yaml http://localhost:5001
+# Tests: 16 passing
+```
+
+---
+
 ## Slide 10: Side-by-Side Comparison
 
-| Feature | Pact | Postman |
-|---------|------|---------|
-| **Setup Complexity** | Medium-High | Low |
-| **Learning Curve** | Steep | Gentle |
-| **Consumer Independence** | ✅ Mock server | ❌ Needs provider |
-| **Provider States** | ✅ Built-in | ❌ Manual setup |
-| **Contract Generation** | ✅ Automatic | ❌ Manual |
-| **Version Management** | ✅ Pact Broker | ⚠️  Manual/Git |
-| **CI/CD Integration** | ✅ Excellent | ✅ Excellent |
-| **Language Support** | ✅ Multi-language | ✅ Any HTTP API |
-| **Debugging** | ⚠️  CLI/Logs | ✅ Visual UI |
-| **Team Familiarity** | ❌ Specialized | ✅ Common tool |
-| **Open Source** | ✅ Fully Open Source | ⚠️  Freemium (OSS core) |
+| Feature | Pact | Postman | OpenAPI |
+|---------|------|---------|---------|
+| **Setup Complexity** | Medium-High | Low | Medium |
+| **Learning Curve** | Steep | Gentle | Medium |
+| **Consumer Independence** | ✅ Mock server | ❌ Needs provider | ✅ Prism mock |
+| **Provider States** | ✅ Built-in | ❌ Manual setup | ❌ Manual setup |
+| **Contract Generation** | ✅ Automatic | ❌ Manual | ❌ Manual |
+| **Version Management** | ✅ Pact Broker | ⚠️  Manual/Git | ✅ In spec |
+| **CI/CD Integration** | ✅ Excellent | ✅ Excellent | ✅ Excellent |
+| **Language Support** | ✅ Multi-language | ✅ Any HTTP API | ✅ Any HTTP API |
+| **API Documentation** | ❌ No | ⚠️  Limited | ✅ Built-in |
+| **Debugging** | ⚠️  CLI/Logs | ✅ Visual UI | ⚠️  CLI/Visual |
+| **Team Familiarity** | ❌ Specialized | ✅ Common tool | ⚠️  Dev-friendly |
+| **Open Source** | ✅ Fully Open Source | ⚠️  Freemium (OSS core) | ✅ Fully Open Source |
 
 ---
 
@@ -282,7 +404,31 @@ newman run contract-tests.json -e environment.json
 
 ---
 
-## Slide 13: Pact Workshop - What We Built
+## Slide 13: When to Use OpenAPI
+
+### ✅ Ideal Scenarios
+- **API-first development** with existing OpenAPI specs
+- **Multiple consumer teams** using same API
+- **Need comprehensive API documentation**
+- **Want built-in mock servers** (Prism)
+- **Legacy systems** with REST APIs
+- **Version compatibility** important
+
+### 🎯 Real-World Use Cases
+- Public APIs with multiple consumers
+- REST API microservices platforms
+- API versioning strategies (v1/v2)
+- DevOps teams automating API validation
+- Organizations with API governance
+
+### Hybrid Approach
+- Use OpenAPI as spec, Pact for critical pairs
+- OpenAPI for documentation, Postman for testing
+- OpenAPI for validation, with business logic tests
+
+---
+
+## Slide 14: Pact Workshop - What We Built
 
 ### Repository Structure
 ```
@@ -307,6 +453,40 @@ pact-workshop-dotnet/
 - Request filters handle dynamic data (auth tokens)
 - Port conflicts can break tests
 - Native libraries must be copied
+
+---
+
+## Slide 15: OpenAPI Demo - What We Built
+
+### Repository Structure
+```
+openapi-contract-testing/
+├── openapi.yaml              # OpenAPI 3.0 spec (single source of truth)
+├── docker-compose.yml        # Docker Compose setup
+│
+├── provider/                 # Node.js Provider API
+│   ├── index.js             # Express server (v1 & v2 support)
+│   ├── Dockerfile
+│   └── package.json
+│
+└── consumer/                # Jest Consumer Tests
+    ├── v1-client.js         # SF 17.1 client
+    ├── v2-client.js         # SF 18.1 client
+    ├── schema-validator.js  # JSON Schema validator
+    └── tests/
+        ├── v1.test.js       # 7 v1 tests (SF 17.1)
+        └── v2.test.js       # 9 v2 tests (SF 18.1)
+```
+
+### Real-World Scenario
+- **SF 17.1 Consumer**: Calls v1 endpoint (legacy)
+- **SF 18.1 Consumer**: Calls v2 endpoint (new)
+- **Provider**: Supports both simultaneously
+- **Contract**: Single OpenAPI spec validates all
+
+### Test Results
+- **Consumer Tests**: 16 passing ✅
+- **All scenarios covered**: Happy path, versioning, schema validation
 
 ---
 
@@ -351,6 +531,26 @@ pact-workshop-dotnet/
 └──────────────┘   └──────────────┘
 ```
 
+### OpenAPI: Specification-First Workflow
+```
+┌─────────────────────────────────────────────────┐
+│      API SPECIFICATION PHASE                    │
+│  1. Design OpenAPI spec (yaml/json)             │
+│  2. Validate spec syntax & semantics            │
+│  3. Generate mock server (Prism)                │
+│  4. Distribute to all teams                     │
+└────────────────┬────────────────────────────────┘
+                 │ OpenAPI Spec
+         ┌───────┴────────┐
+         ▼                ▼
+┌──────────────┐   ┌──────────────┐
+│   PROVIDER   │   │   CONSUMER   │
+│ Validate req │   │ Validate req │
+│ Validate res │   │ Validate res │
+│ Impl by spec │   │ Test by spec │
+└──────────────┘   └──────────────┘
+```
+
 ---
 
 ## Slide 16: CI/CD Integration Examples
@@ -385,6 +585,25 @@ pact-workshop-dotnet/
       --reporters cli,junit \
       --reporter-junit-export results.xml
   displayName: 'Run Contract Tests'
+```
+
+### OpenAPI Validation in Azure Pipelines
+```yaml
+# OpenAPI contract validation
+- task: Npm@1
+  inputs:
+    command: 'custom'
+    customCommand: 'install -g swagger-cli @stoplight/spectral-cli'
+
+- script: |
+    swagger-cli validate openapi.yaml
+    spectral lint openapi.yaml
+  displayName: 'Validate OpenAPI Spec'
+
+- script: |
+    npm install -g dredd
+    dredd openapi.yaml http://localhost:5001
+  displayName: 'Run Dredd Contract Tests'
 ```
 
 ---
@@ -558,11 +777,20 @@ pact-workshop-dotnet/
 ✅ Limited technical resources  
 ✅ Provider-driven development
 
-### Use Both?
-🤔 **Hybrid Approach**:
-- Pact for core service contracts
-- Postman for exploratory/functional testing
-- Postman for third-party API validation
+### Choose OpenAPI If:
+✅ API-first development already in place  
+✅ Need built-in API documentation  
+✅ Want mock servers (Prism)  
+✅ Multiple consumer versions (v1/v2)  
+✅ Need spec-driven governance  
+✅ Prefer specification over code
+
+### Use Multiple Approaches?
+🤔 **Hybrid Strategy**:
+- **OpenAPI** as source of truth (spec)
+- **Pact** for critical service contracts
+- **Postman** for exploratory/functional testing
+- **Each tool excels** at different aspects
 
 ---
 
@@ -629,12 +857,20 @@ pact-workshop-dotnet/
 - **Example**: `postman-contract-testing/` directory
 - **Community**: Postman community forums
 
+### OpenAPI Resources
+- **Docs**: https://spec.openapis.org
+- **Prism Mock Server**: https://stoplight.io/prism/
+- **Dredd**: https://dredd.org/
+- **Spectral Linter**: https://meta.stoplight.io/docs/spectral
+- **Example**: `openapi-contract-testing/` directory
+
 ### Getting Started
-1. Review both examples in this repository
-2. Run the demos locally
-3. Choose approach for your team
-4. Start with one service pair
-5. Iterate and expand
+1. Review all three examples in this repository
+2. Run the demos locally (Pact, Postman, OpenAPI)
+3. Choose primary approach for your team
+4. Consider hybrid approach as you scale
+5. Start with one service pair
+6. Iterate and expand coverage
 
 ---
 
@@ -693,6 +929,7 @@ pact-workshop-dotnet/
 ```
 ✅ Working Pact example (Consumer + Provider)
 ✅ Working Postman example (Consumer + Provider)  
+✅ Working OpenAPI example (Consumer + Provider + Spec)
 ✅ Troubleshooting documentation
 ✅ Comparison matrices
 ✅ This presentation
@@ -701,7 +938,7 @@ pact-workshop-dotnet/
 **Clone it**: 
 ```bash
 git clone <your-repo-url>
-cd pact-workshop-dotnet-master
+cd contract-testing
 ```
 
 ---
