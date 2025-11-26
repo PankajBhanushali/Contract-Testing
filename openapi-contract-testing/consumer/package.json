@@ -1,0 +1,15 @@
+{
+  "name": "openapi-consumer-tests",
+  "version": "1.0.0",
+  "description": "Consumer contract tests for OpenAPI",
+  "scripts": {
+    "test": "jest",
+    "test:v1": "jest tests/v1.test.js",
+    "test:v2": "jest tests/v2.test.js",
+    "test:watch": "jest --watch"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "axios": "^1.6.0"
+  }
+}

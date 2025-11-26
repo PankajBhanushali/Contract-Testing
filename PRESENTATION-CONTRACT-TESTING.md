@@ -309,30 +309,6 @@ pact-workshop-dotnet/
 
 ---
 
-## Slide 14: Common Pitfalls & Solutions
-
-### Pact Challenges
-❌ **Problem**: "Unable to start mock server"  
-✅ **Solution**: Port conflicts (check with `Get-NetTCPConnection`), add `CopyLocalLockFileAssemblies`
-
-❌ **Problem**: Native DLL not found  
-✅ **Solution**: Add `<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>` to test project
-
-❌ **Problem**: Provider tests fail with 401  
-✅ **Solution**: Implement `AuthTokenRequestFilter` middleware for dynamic auth tokens
-
-❌ **Problem**: Pact file has stale data  
-✅ **Solution**: Regenerate pact file after consumer changes
-
-### Postman Challenges
-❌ **Problem**: Tests pass but real integration fails  
-✅ **Solution**: Postman only validates running service, doesn't catch all scenarios
-
-❌ **Problem**: Contract drift between teams  
-✅ **Solution**: Automate collection runs in CI, version collections in Git
-
----
-
 ## Slide 15: Architecture Patterns
 
 ### Pact: Consumer-Driven Workflow

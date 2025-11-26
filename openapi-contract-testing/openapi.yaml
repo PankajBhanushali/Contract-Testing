@@ -1,0 +1,174 @@
+openapi: 3.0.0
+info:
+  title: Users API
+  version: 2.0.0
+  description: |
+    API for managing users with multiple versions
+    - v1: Basic user information (SF 17.1)
+    - v2: Extended user information with email and role (SF 18.1)
+
+servers:
+  - url: http://localhost:5001
+    description: Development server
+  - url: https://api.production.com
+    description: Production server
+
+tags:
+  - name: Users
+    description: User management endpoints
+
+paths:
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Get all users
+      description: |
+        Retrieve all users.
+        
+        **Version support:**
+        - Without `apiVersion` query param: Returns v1 format (SF 17.1 compatible)
+        - With `apiVersion=2`: Returns v2 format (SF 18.1 compatible)
+      operationId: getUsers
+      parameters:
+        - name: apiVersion
+          in: query
+          description: API version to use for response format
+          required: false
+          schema:
+            type: string
+            enum: ["1", "2"]
+            default: "1"
+        - name: limit
+          in: query
+          description: Maximum number of users to return
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+      responses:
+        "200":
+          description: Successful response with users list
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/UsersResponseV1"
+                  - $ref: "#/components/schemas/UsersResponseV2"
+              examples:
+                v1:
+                  summary: V1 Response Format
+                  value:
+                    users:
+                      - id: 1
+                        name: "John Doe"
+                      - id: 2
+                        name: "Jane Smith"
+                v2:
+                  summary: V2 Response Format
+                  value:
+                    users:
+                      - id: 1
+                        name: "John Doe"
+                        email: "john@company.com"
+                        role: "admin"
+                      - id: 2
+                        name: "Jane Smith"
+                        email: "jane@company.com"
+                        role: "user"
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    # V1 Response Schema - Basic
+    UsersResponseV1:
+      type: object
+      required:
+        - users
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserV1"
+
+    UserV1:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          description: User unique identifier
+          example: 1
+        name:
+          type: string
+          description: User full name
+          example: "John Doe"
+
+    # V2 Response Schema - Extended
+    UsersResponseV2:
+      type: object
+      required:
+        - users
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserV2"
+
+    UserV2:
+      type: object
+      required:
+        - id
+        - name
+        - email
+        - role
+      properties:
+        id:
+          type: integer
+          description: User unique identifier
+          example: 1
+        name:
+          type: string
+          description: User full name
+          example: "John Doe"
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: "john@company.com"
+        role:
+          type: string
+          enum:
+            - admin
+            - user
+            - guest
+          description: User role
+          example: "admin"
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: "INVALID_PARAMETER"
+        message:
+          type: string
+          example: "Invalid apiVersion parameter"
