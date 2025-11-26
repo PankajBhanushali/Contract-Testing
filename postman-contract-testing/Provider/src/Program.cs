@@ -13,16 +13,13 @@ builder.Services.AddSingleton<IProductRepository, ProductRepository>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
 
 public interface IProductRepository
 {
@@ -42,6 +39,7 @@ public class ProductRepository : IProductRepository
     public Product? GetById(int id) => _products.FirstOrDefault(p => p.Id == id);
 }
 
+#nullable enable
 public class Product
 {
     public int Id { get; set; }
@@ -49,3 +47,4 @@ public class Product
     public string Type { get; set; } = string.Empty;
     public string Version { get; set; } = string.Empty;
 }
+#nullable restore
