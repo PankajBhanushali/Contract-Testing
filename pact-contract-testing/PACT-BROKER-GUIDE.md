@@ -1,76 +1,46 @@
-# Pact Broker in Docker - Complete Setup & Usage Guide
+# Pact Broker - Integration & Usage Guide
 
 ## Overview
 
-This guide explains how to set up a local Pact Broker using Docker, publish consumer pacts to it, and configure provider verification to pull contracts from the broker instead of local files. This enables a centralized contract management workflow for CI/CD pipelines.
+This guide explains how to publish consumer pacts to the Siemens Lab Pact Broker and configure provider verification to pull contracts from the broker. The Pact Broker provides centralized contract management for CI/CD pipelines.
+
+### Current Broker Configuration
+- **Broker URL**: `http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/`
+- **Environment**: Siemens Lab (tiger01-dev.ba.lab.local)
+- **Status**: Active and ready for pact publishing and verification
 
 ## Prerequisites
 
-- Docker Desktop installed and running
+- Network access to `http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/`
 - .NET 8.0 SDK
 - PowerShell 5.1+
 - Your consumer and provider Pact tests already set up and passing
+- PactNet 5.0+ NuGet package
 
-## Part 1: Starting the Pact Broker in Docker
+## Part 1: Connecting to the Pact Broker
 
-### 1.1 Launch the Broker Container
+### 1.1 Broker Access
 
-Start a Pact Broker container with an in-memory SQLite database:
+The Pact Broker is hosted at:
+- **Main URL**: `http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/`
+- **Dashboard**: `http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/dashboard`
+- **API Docs**: `http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/swagger/index.html` (if available)
 
-```powershell
-docker run -d `
-  --name pact-broker `
-  -p 9292:9292 `
-  -e PACT_BROKER_DATABASE_ADAPTER=sqlite `
-  -e PACT_BROKER_DATABASE_NAME=:memory: `
-  pactfoundation/pact-broker
-```
+### 1.2 Verify Broker Connectivity
 
-**Parameters explained:**
-- `-d`: Run in detached mode (background)
-- `--name pact-broker`: Container name for easy reference
-- `-p 9292:9292`: Map container port 9292 to host port 9292
-- `-e PACT_BROKER_DATABASE_ADAPTER=sqlite`: Use SQLite adapter (lightweight)
-- `-e PACT_BROKER_DATABASE_NAME=:memory:`: Use in-memory database (resets on container restart)
-- `pactfoundation/pact-broker`: Official Pact Broker Docker image
-
-### 1.2 Verify Broker is Running
-
-Check container status:
+Test connectivity from PowerShell:
 
 ```powershell
-docker ps --filter "name=pact-broker"
-```
-
-Test connectivity:
-
-```powershell
-Invoke-WebRequest -Uri http://localhost:9292/diagnostic/status/heartbeat | Select-Object StatusCode
+$brokerUrl = "http://puvsfpactserver.tiger01-dev.ba.lab.local:9292"
+Invoke-WebRequest -Uri "$brokerUrl/diagnostic/status/heartbeat" -ErrorAction SilentlyContinue | Select-Object StatusCode
 # Expected output: StatusCode: 200
 ```
 
 ### 1.3 Access the Broker UI
 
-Open in your browser: **http://localhost:9292**
+Open in your browser: **http://puvsfpactserver.tiger01-dev.ba.lab.local:9292**
 
 You'll see the Pact Broker dashboard where you can view published pacts and their verification status.
-
-### 1.4 Stop or Restart the Broker
-
-Stop the broker:
-```powershell
-docker stop pact-broker
-```
-
-Restart the broker:
-```powershell
-docker start pact-broker
-```
-
-Remove the broker container (and delete all data):
-```powershell
-docker rm pact-broker
-```
 
 ---
 
@@ -94,7 +64,7 @@ Publish the pact directly to the broker using the HTTP API:
 ```powershell
 $pactPath = "C:\path\to\pact-contract-testing\pacts\ApiClient-ProductService.json"
 $pactContent = Get-Content -Path $pactPath -Raw
-$uri = "http://localhost:9292/pacts/provider/ProductService/consumer/ApiClient/version/1.0.0"
+$uri = "http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/pacts/provider/ProductService/consumer/ApiClient/version/1.0.0"
 
 Invoke-WebRequest -Uri $uri `
   -Method PUT `
@@ -112,7 +82,7 @@ Invoke-WebRequest -Uri $uri `
 Check the broker UI or query the API:
 
 ```powershell
-$latestPact = Invoke-WebRequest -Uri "http://localhost:9292/pacts/provider/ProductService/consumer/ApiClient/latest" | ConvertFrom-Json
+$latestPact = Invoke-WebRequest -Uri "http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/pacts/provider/ProductService/consumer/ApiClient/latest" | ConvertFrom-Json
 $latestPact | Select-Object -Property "consumer", "provider"
 
 # Output:
@@ -127,7 +97,7 @@ To manage multiple deployment environments, publish with tags:
 ```powershell
 $pactPath = "C:\path\to\pact-contract-testing\pacts\ApiClient-ProductService.json"
 $pactContent = Get-Content -Path $pactPath -Raw
-$uri = "http://localhost:9292/pacts/provider/ProductService/consumer/ApiClient/version/1.0.0"
+$uri = "http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/pacts/provider/ProductService/consumer/ApiClient/version/1.0.0"
 
 # Add tag parameter for environment tracking
 $uri += "?tag=main"  # or "?tag=prod", "?tag=develop", etc.
@@ -158,7 +128,7 @@ pactVerifier.WithHttpEndpoint(new Uri(_pactServiceUri))
 **After (broker source):**
 ```csharp
 pactVerifier.WithHttpEndpoint(new Uri(_pactServiceUri))
-    .WithUriSource(new Uri("http://localhost:9292/pacts/provider/ProductService/consumer/ApiClient/latest"))
+    .WithUriSource(new Uri("http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/pacts/provider/ProductService/consumer/ApiClient/latest"))
     .WithProviderStateUrl(new Uri($"{_pactServiceUri}/provider-states"))
     .Verify();
 ```
@@ -183,9 +153,9 @@ Standard endpoints:
 
 | Endpoint | Purpose |
 |----------|---------|
-| `http://localhost:9292/pacts/provider/ProductService/consumer/ApiClient/latest` | Latest published pact |
-| `http://localhost:9292/pacts/provider/ProductService/consumer/ApiClient/version/1.0.0` | Specific version |
-| `http://localhost:9292/pacts/provider/ProductService/consumer/ApiClient/latest/main` | Latest with tag `main` |
+| `http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/pacts/provider/ProductService/consumer/ApiClient/latest` | Latest published pact |
+| `http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/pacts/provider/ProductService/consumer/ApiClient/version/1.0.0` | Specific version |
+| `http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/pacts/provider/ProductService/consumer/ApiClient/latest/main` | Latest with tag `main` |
 
 ---
 
@@ -202,7 +172,7 @@ dotnet test .\Consumer
 # 2. Publish pact to broker
 $pactPath = "C:\path\to\pact-contract-testing\pacts\ApiClient-ProductService.json"
 $pactContent = Get-Content -Path $pactPath -Raw
-$uri = "http://localhost:9292/pacts/provider/ProductService/consumer/ApiClient/version/1.0.0?tag=main"
+$uri = "http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/pacts/provider/ProductService/consumer/ApiClient/version/1.0.0?tag=main"
 
 Invoke-WebRequest -Uri $uri `
   -Method PUT `
@@ -227,7 +197,7 @@ Write-Host "✅ All pacts verified - safe to deploy"
 Get pact publication details:
 
 ```powershell
-$pact = Invoke-WebRequest -Uri "http://localhost:9292/pacts/provider/ProductService/consumer/ApiClient/latest" | ConvertFrom-Json
+$pact = Invoke-WebRequest -Uri "http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/pacts/provider/ProductService/consumer/ApiClient/latest" | ConvertFrom-Json
 
 Write-Host "Consumer: $($pact.consumer.name)"
 Write-Host "Provider: $($pact.provider.name)"
@@ -323,7 +293,7 @@ $webhookConfig = @{
 **Solution:**
 1. Test broker connectivity from test machine:
    ```powershell
-   Invoke-WebRequest -Uri "http://localhost:9292/pacts/provider/ProductService/consumer/ApiClient/latest"
+   Invoke-WebRequest -Uri "http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/pacts/provider/ProductService/consumer/ApiClient/latest"
    ```
 2. Verify exact URI in test matches broker API format
 3. Ensure pact has been published before running provider tests
@@ -346,7 +316,7 @@ $webhookConfig = @{
 $version = "1.2.3"  # Major.Minor.Patch
 
 # Publish with environment tag
-$uri = "http://localhost:9292/pacts/provider/ProductService/consumer/ApiClient/version/$version?tag=main"
+$uri = "http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/pacts/provider/ProductService/consumer/ApiClient/version/$version?tag=main"
 ```
 
 ### 7.2 CI/CD Integration
@@ -427,20 +397,20 @@ docker logs pact-broker | Select-String "ERROR"  # Show only errors
 docker run -d --name pact-broker -p 9292:9292 -e PACT_BROKER_DATABASE_ADAPTER=sqlite -e PACT_BROKER_DATABASE_NAME=:memory: pactfoundation/pact-broker
 
 # Test broker
-Invoke-WebRequest -Uri http://localhost:9292/diagnostic/status/heartbeat
+Invoke-WebRequest -Uri http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/diagnostic/status/heartbeat
 
 # Run consumer tests
 dotnet test .\pact-contract-testing\Consumer
 
 # Publish pact
 $pact = Get-Content -Raw "pact-contract-testing\pacts\ApiClient-ProductService.json"
-Invoke-WebRequest -Uri "http://localhost:9292/pacts/provider/ProductService/consumer/ApiClient/version/1.0.0" -Method PUT -Body $pact -ContentType "application/json"
+Invoke-WebRequest -Uri "http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/pacts/provider/ProductService/consumer/ApiClient/version/1.0.0" -Method PUT -Body $pact -ContentType "application/json"
 
 # Run provider tests
 dotnet test .\pact-contract-testing\Provider
 
 # View broker
-Start-Process "http://localhost:9292"
+Start-Process "http://puvsfpactserver.tiger01-dev.ba.lab.local:9292"
 ```
 
 ---

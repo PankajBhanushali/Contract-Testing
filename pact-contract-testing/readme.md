@@ -73,14 +73,14 @@ To adopt a centralized Pact Broker workflow for professional CI/CD pipelines:
 2. **Publish pact after consumer tests pass:**
    ```powershell
    $pact = Get-Content -Raw "pacts/ApiClient-ProductService.json"
-   Invoke-WebRequest -Uri "http://localhost:9292/pacts/provider/ProductService/consumer/ApiClient/version/1.0.0" `
+   Invoke-WebRequest -Uri "http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/pacts/provider/ProductService/consumer/ApiClient/version/1.0.0" `
      -Method PUT -Body $pact -ContentType "application/json"
    ```
 
 3. **Configure provider to verify from broker:**
    Update `Provider/tests/ProductTest.cs` to use:
    ```csharp
-   .WithUriSource(new Uri("http://localhost:9292/pacts/provider/ProductService/consumer/ApiClient/latest"))
+   .WithUriSource(new Uri("http://puvsfpactserver.tiger01-dev.ba.lab.local:9292/pacts/provider/ProductService/consumer/ApiClient/latest"))
    ```
 
 4. **Enforce can-i-deploy checks pre-deployment** (optional, requires Pact broker CLI).
